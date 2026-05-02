@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Analizador de Cromatogramas — AGS Analítica</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -80,12 +80,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .disclaimer { font-size: 10px; color: #bbb; text-align: center; line-height: 1.6; }
 .disclaimer a { color: #0B2545; text-decoration: none; }
 .hidden { display: none !important; }
-.zoom-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.zoom-btn { width: 36px; height: 36px; border: 1.5px solid #ddd; border-radius: 8px; background: #fff; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #0B2545; flex-shrink: 0; }
-.zoom-btn:active { background: #f0f4ff; }
-.zoom-label { font-size: 11px; color: #888; flex: 1; text-align: center; }
-.canvas-outer { overflow: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; background: #222; margin-bottom: 8px; width: 100%; }
-.canvas-outer canvas { display: block; cursor: crosshair; touch-action: none; transform-origin: top left; }
+.canvas-hint-zoom { font-size: 11px; color: #888; text-align:center; margin-bottom:4px; }
+.canvas-outer { width: 100%; border-radius: 10px; background: #222; margin-bottom: 8px; overflow: hidden; }
+.canvas-outer canvas { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: none; }
 </style>
 </head>
 <body>
@@ -133,11 +130,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           Usá dos dedos para hacer zoom.<br>
           Luego <strong>arrastrá con un dedo</strong> sobre la baseline del pico (de izq a der o viceversa).
         </div>
-        <div class="zoom-bar">
-          <button class="zoom-btn" onclick="zoomCanvas('peak', -1)">−</button>
-          <span class="zoom-label" id="peak-zoom-label">100%</span>
-          <button class="zoom-btn" onclick="zoomCanvas('peak', 1)">+</button>
-        </div>
+        <div class="canvas-hint-zoom">Hacé zoom nativo (pellizco) sobre la imagen para acercar</div>
         <div class="canvas-outer" id="peak-outer">
           <canvas id="peak-canvas"></canvas>
         </div>
@@ -184,11 +177,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="canvas-hint" id="noise-hint">
           Arrastrá para seleccionar la región de ruido.<br>Ajustá los bordes con los handles.
         </div>
-        <div class="zoom-bar">
-          <button class="zoom-btn" onclick="zoomCanvas('noise', -1)">−</button>
-          <span class="zoom-label" id="noise-zoom-label">100%</span>
-          <button class="zoom-btn" onclick="zoomCanvas('noise', 1)">+</button>
-        </div>
         <div class="canvas-outer" id="noise-outer">
           <canvas id="noise-canvas"></canvas>
         </div>
@@ -233,30 +221,11 @@ var S = {
   method: 'usp'
 };
 
-var ZOOM_STEPS = [0.5, 0.75, 1, 1.5, 2, 3, 4];
 
-function zoomCanvas(which, dir) {
-  var cur = S[which].zoom || 1;
-  var idx = ZOOM_STEPS.indexOf(cur);
-  if (idx === -1) idx = 2;
-  idx = Math.max(0, Math.min(ZOOM_STEPS.length-1, idx + dir));
-  S[which].zoom = ZOOM_STEPS[idx];
-  var el = document.getElementById(which+'-canvas');
-  // Use CSS transform scale - avoids iOS height bug entirely
-  el.style.transform = 'scale(' + S[which].zoom + ')';
-  // Expand the outer container to accommodate scaled size
-  var outer = document.getElementById(which+'-outer');
-  var baseW = S[which]._baseW || 360;
-  var baseH = S[which]._baseH || 200;
-  outer.style.height = Math.round(baseH * S[which].zoom) + 'px';
-  document.getElementById(which+'-zoom-label').textContent = Math.round(S[which].zoom*100) + '%';
-  // bindEvents still needed so coordinate mapping stays correct
-  bindEvents(which);
-}
 
-function applyZoom(which) {
-  // Now handled by zoomCanvas directly
-}
+
+
+
 
 var MDESC = {
   usp: '<strong>USP &lt;621&gt;:</strong> S/N = 2H/h. H = altura desde la baseline. h = amplitud pico-a-pico del ruido.',
