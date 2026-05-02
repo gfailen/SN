@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analizador de Cromatogramas — AGS Analítica</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -34,7 +34,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .upload-hint { font-size: 11px; color: #888; }
 
 /* Canvas area - allows pinch zoom */
-.canvas-outer { width: 100%; overflow: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; background: #222; margin-bottom: 8px; touch-action: pan-x pan-y pinch-zoom; }
+
 .canvas-outer canvas { display: block; max-width: 100%; height: auto; cursor: crosshair; touch-action: pinch-zoom; }
 .canvas-hint { font-size: 11px; color: #555; text-align: center; margin-bottom: 5px; line-height: 1.5; min-height: 32px; }
 
@@ -80,6 +80,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .disclaimer { font-size: 10px; color: #bbb; text-align: center; line-height: 1.6; }
 .disclaimer a { color: #0B2545; text-decoration: none; }
 .hidden { display: none !important; }
+.zoom-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.zoom-btn { width: 36px; height: 36px; border: 1.5px solid #ddd; border-radius: 8px; background: #fff; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #0B2545; flex-shrink: 0; }
+.zoom-btn:active { background: #f0f4ff; }
+.zoom-label { font-size: 11px; color: #888; flex: 1; text-align: center; }
+.canvas-outer { overflow: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; background: #222; margin-bottom: 8px; width: 100%; }
+.canvas-outer canvas { display: block; cursor: crosshair; touch-action: none; }
 </style>
 </head>
 <body>
@@ -127,6 +133,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           Usá dos dedos para hacer zoom.<br>
           Luego <strong>arrastrá con un dedo</strong> sobre la baseline del pico (de izq a der o viceversa).
         </div>
+        <div class="zoom-bar">
+          <button class="zoom-btn" onclick="zoomCanvas('peak', -1)">−</button>
+          <span class="zoom-label" id="peak-zoom-label">100%</span>
+          <button class="zoom-btn" onclick="zoomCanvas('peak', 1)">+</button>
+        </div>
         <div class="canvas-outer" id="peak-outer">
           <canvas id="peak-canvas"></canvas>
         </div>
@@ -173,6 +184,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="canvas-hint" id="noise-hint">
           Arrastrá para seleccionar la región de ruido.<br>Ajustá los bordes con los handles.
         </div>
+        <div class="zoom-bar">
+          <button class="zoom-btn" onclick="zoomCanvas('noise', -1)">−</button>
+          <span class="zoom-label" id="noise-zoom-label">100%</span>
+          <button class="zoom-btn" onclick="zoomCanvas('noise', 1)">+</button>
+        </div>
         <div class="canvas-outer" id="noise-outer">
           <canvas id="noise-canvas"></canvas>
         </div>
@@ -211,11 +227,47 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div>
 <script>
 var S = {
-  peak:  { img:null, src:null, curve:null, plotArea:null, baseline:null, peak:null, ymax:null, ymin:null },
-  noise: { img:null, src:null, curve:null, plotArea:null, sel:null, noise:null, ymax:null, ymin:null },
+  peak:  { img:null, src:null, curve:null, plotArea:null, baseline:null, peak:null, ymax:null, ymin:null, zoom:1 },
+  noise: { img:null, src:null, curve:null, plotArea:null, sel:null, noise:null, ymax:null, ymin:null, zoom:1 },
   drag:  { active:false, which:null, startX:0, startY:0, mode:null },
   method: 'usp'
 };
+
+var ZOOM_STEPS = [0.5, 0.75, 1, 1.5, 2, 3, 4];
+
+function zoomCanvas(which, dir) {
+  var cur = S[which].zoom || 1;
+  var idx = ZOOM_STEPS.indexOf(cur);
+  if (idx === -1) idx = 2;
+  idx = Math.max(0, Math.min(ZOOM_STEPS.length-1, idx + dir));
+  S[which].zoom = ZOOM_STEPS[idx];
+  applyZoom(which);
+}
+
+function applyZoom(which) {
+  var src  = S[which].src;
+  if (!src) return;
+  var zoom = S[which].zoom || 1;
+  var outer = document.getElementById(which+'-outer');
+  var baseW = outer.clientWidth || 360;
+  var el    = document.getElementById(which+'-canvas');
+  var newW  = Math.round(baseW * zoom);
+  el.style.width  = newW + 'px';
+  el.style.height = Math.round(src.height * newW / src.width) + 'px';
+  document.getElementById(which+'-zoom-label').textContent = Math.round(zoom*100) + '%';
+  // Re-bind events since element size changed
+  bindEvents(which);
+  // Redraw
+  if (which === 'peak') {
+    S[which].ctx.drawImage(src, 0, 0);
+    drawPlotBorder('peak');
+    if (S.peak.baseline) drawBaselineCommitted();
+  } else {
+    S[which].ctx.drawImage(src, 0, 0);
+    drawPlotBorder('noise');
+    if (S.noise.sel) redrawNoise();
+  }
+}
 
 var MDESC = {
   usp: '<strong>USP &lt;621&gt;:</strong> S/N = 2H/h. H = altura desde la baseline. h = amplitud pico-a-pico del ruido.',
@@ -351,9 +403,11 @@ function setupCanvas(which) {
   var src = S[which].src;
   el.width  = src.width;
   el.height = src.height;
+  S[which].zoom = 1;
   var dw = document.getElementById(which+'-outer').clientWidth || 360;
   el.style.width  = dw+'px';
   el.style.height = Math.round(src.height*dw/src.width)+'px';
+  document.getElementById(which+'-zoom-label').textContent = '100%';
   var ctx = el.getContext('2d', { willReadFrequently:true });
   ctx.drawImage(src, 0, 0);
   S[which].ctx = ctx;
@@ -509,14 +563,25 @@ function commitBaseline() {
     if (curve[i]!==null && curve[i]>maxVal) { maxVal=curve[i]; maxIdx=i; }
   }
 
-  // Baseline at apex: interpolate along the drawn line
-  var frac  = (x2-x1)>0 ? ((pa.x+maxIdx)-x1)/(x2-x1) : 0.5;
-  // y in canvas coords → convert to normalized (0=bottom, 1=top)
+  // Apex canvas Y: use curve value mapped to plot area
+  // curve value is normalized 0-1 (1=top of plot area)
+  var apexCanvasY = pa.y + (1 - maxVal) * pa.h;
+
+  // Baseline at apex: interpolate along the drawn line at the apex X position
+  var apexCanvasX = pa.x + maxIdx;
+  var frac = (x2-x1)>0 ? (apexCanvasX - x1)/(x2-x1) : 0.5;
+  frac = Math.max(0, Math.min(1, frac));
   var baseCanvasY = y1 + frac*(y2-y1);
   var baseNorm    = 1 - (baseCanvasY - pa.y) / pa.h;
 
+  // Safety: if baseline is above apex, something is wrong - warn user
+  if (baseCanvasY < apexCanvasY) {
+    baseCanvasY = apexCanvasY + 10; // prevent negative H
+    baseNorm = 1 - (baseCanvasY - pa.y) / pa.h;
+  }
+
   S.peak.baseline = { x1:x1, y1:y1, x2:x2, y2:y2 };
-  S.peak.peak     = { maxVal:maxVal, maxIdx:maxIdx, baseAtApex:baseNorm, baseCanvasY:baseCanvasY, i1:i1, i2:i2 };
+  S.peak.peak     = { maxVal:maxVal, maxIdx:maxIdx, baseAtApex:baseNorm, baseCanvasY:baseCanvasY, apexCanvasY:apexCanvasY, i1:i1, i2:i2 };
 
   redrawPeak();
   drawBaselineCommitted();
@@ -544,15 +609,15 @@ function drawBaselineCommitted() {
   ctx.beginPath(); ctx.arc(bl.x1, bl.y1, 5, 0, Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.arc(bl.x2, bl.y2, 5, 0, Math.PI*2); ctx.fill();
 
-  // Apex dot
+  // Apex dot - use stored apexCanvasY for accuracy
   var apX = pa.x + pk.maxIdx;
-  var apY = pa.y + (1-pk.maxVal) * pa.h;
+  var apY = pk.apexCanvasY !== undefined ? pk.apexCanvasY : pa.y + (1-pk.maxVal)*pa.h;
   ctx.fillStyle = '#E24B4A';
   ctx.beginPath(); ctx.arc(apX, apY, 6, 0, Math.PI*2); ctx.fill();
 
-  // H line
+  // H line from apex to baseline
   ctx.strokeStyle = '#E24B4A';
-  ctx.lineWidth   = 2.5;
+  ctx.lineWidth   = 3;
   ctx.setLineDash([4,3]);
   ctx.beginPath();
   ctx.moveTo(apX, apY);
@@ -562,8 +627,8 @@ function drawBaselineCommitted() {
 
   // H label
   ctx.fillStyle   = '#E24B4A';
-  ctx.font        = 'bold 14px sans-serif';
-  ctx.fillText('H', apX+7, (apY+pk.baseCanvasY)/2+5);
+  ctx.font        = 'bold 16px sans-serif';
+  ctx.fillText('H', apX+8, (apY+pk.baseCanvasY)/2+6);
 }
 
 // ── NOISE ─────────────────────────────────────────────────────
