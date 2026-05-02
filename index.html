@@ -85,7 +85,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .zoom-btn:active { background: #f0f4ff; }
 .zoom-label { font-size: 11px; color: #888; flex: 1; text-align: center; }
 .canvas-outer { overflow: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; background: #222; margin-bottom: 8px; width: 100%; }
-.canvas-outer canvas { display: block; cursor: crosshair; touch-action: none; }
+.canvas-outer canvas { display: block; cursor: crosshair; touch-action: none; transform-origin: top left; }
 </style>
 </head>
 <body>
@@ -241,53 +241,21 @@ function zoomCanvas(which, dir) {
   if (idx === -1) idx = 2;
   idx = Math.max(0, Math.min(ZOOM_STEPS.length-1, idx + dir));
   S[which].zoom = ZOOM_STEPS[idx];
-  var el   = document.getElementById(which+'-canvas');
-  var src  = S[which].src;
-  var baseW = S[which]._baseW || (document.getElementById(which+'-outer').clientWidth || 360);
-  var newW  = Math.round(baseW * S[which].zoom);
-  var newH  = Math.round(src.height * newW / src.width);
-  el.style.width  = newW + 'px';
-  el.style.height = newH + 'px';
+  var el = document.getElementById(which+'-canvas');
+  // Use CSS transform scale - avoids iOS height bug entirely
+  el.style.transform = 'scale(' + S[which].zoom + ')';
+  // Expand the outer container to accommodate scaled size
+  var outer = document.getElementById(which+'-outer');
+  var baseW = S[which]._baseW || 360;
+  var baseH = S[which]._baseH || 200;
+  outer.style.height = Math.round(baseH * S[which].zoom) + 'px';
   document.getElementById(which+'-zoom-label').textContent = Math.round(S[which].zoom*100) + '%';
+  // bindEvents still needed so coordinate mapping stays correct
   bindEvents(which);
-  if (which === 'peak') {
-    S[which].ctx.drawImage(src, 0, 0);
-    drawPlotBorder('peak');
-    if (S.peak.baseline) drawBaselineCommitted();
-  } else {
-    S[which].ctx.drawImage(src, 0, 0);
-    drawPlotBorder('noise');
-    if (S.noise.sel) redrawNoise();
-  }
 }
 
 function applyZoom(which) {
-  var src = S[which].src;
-  if (!src) return;
-  var zoom  = S[which].zoom || 1;
-  var outer = document.getElementById(which+'-outer');
-  var baseW = Math.round((outer.clientWidth || 360) / (S[which]._baseZoom || 1));
-  if (!S[which]._baseZoom) {
-    S[which]._baseZoom = 1;
-    baseW = outer.clientWidth || 360;
-  }
-  var el   = document.getElementById(which+'-canvas');
-  var newW = Math.round(baseW * zoom);
-  var newH = Math.round(src.height * newW / src.width);
-  // CSS size controls display, canvas internal size stays the same (src dimensions)
-  el.style.width  = newW + 'px';
-  el.style.height = newH + 'px';
-  document.getElementById(which+'-zoom-label').textContent = Math.round(zoom*100) + '%';
-  bindEvents(which);
-  if (which === 'peak') {
-    S[which].ctx.drawImage(src, 0, 0);
-    drawPlotBorder('peak');
-    if (S.peak.baseline) drawBaselineCommitted();
-  } else {
-    S[which].ctx.drawImage(src, 0, 0);
-    drawPlotBorder('noise');
-    if (S.noise.sel) redrawNoise();
-  }
+  // Now handled by zoomCanvas directly
 }
 
 var MDESC = {
@@ -433,6 +401,7 @@ function setupCanvas(which) {
   el.style.width  = dw + 'px';
   el.style.height = dh + 'px';
   S[which]._baseW = dw;
+  S[which]._baseH = dh;
   S[which]._baseZoom = 1;
   document.getElementById(which+'-zoom-label').textContent = '100%';
   var ctx = el.getContext('2d', { willReadFrequently:true });
@@ -480,8 +449,12 @@ function bindEvents(which) {
 }
 
 function getPos(e, which) {
-  var el   = document.getElementById(which+'-canvas');
-  var rect = el.getBoundingClientRect();
+  var el    = document.getElementById(which+'-canvas');
+  var rect  = el.getBoundingClientRect();
+  var zoom  = S[which].zoom || 1;
+  // rect.width = el.width * zoom (because of CSS transform scale)
+  // so scaleX = el.width / rect.width = 1/zoom
+  // but we want canvas coordinates, so divide by zoom
   var scaleX = el.width  / rect.width;
   var scaleY = el.height / rect.height;
   return {
