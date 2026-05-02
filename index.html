@@ -13,36 +13,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .app-sub{font-size:11px;color:#888;text-align:center;margin-bottom:14px}
 .card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .card-title{font-size:13px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.stepdot{width:22px;height:22px;border-radius:50%;background:#ccc;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-.stepdot.active{background:#378ADD}
-.stepdot.done{background:#1D9E75}
+.sdot{width:22px;height:22px;border-radius:50%;background:#ccc;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.sdot.active{background:#378ADD}.sdot.done{background:#1D9E75}
 .hint{font-size:11px;color:#555;line-height:1.5;text-align:center;padding:5px 0;min-height:30px}
-.upload-zone{position:relative;border:2px dashed #c8d0e0;border-radius:10px;padding:18px 14px;text-align:center;background:#f8faff;display:flex;flex-direction:column;align-items:center;gap:5px}
-.upload-zone input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
-.uicon{font-size:28px}
-.utitle{font-size:14px;font-weight:600;color:#1a1a2e}
-.usub{font-size:11px;color:#888}
-.canvas-wrap{width:100%;border-radius:8px;overflow:hidden;background:#111;margin:8px 0}
-canvas{display:block;width:100%;height:auto}
-canvas.selecting{touch-action:none;cursor:crosshair}
-canvas.drawing{touch-action:none;cursor:crosshair}
-canvas.free{touch-action:pan-x pan-y pinch-zoom;cursor:default}
+.uzone{position:relative;border:2px dashed #c8d0e0;border-radius:10px;padding:18px 14px;text-align:center;background:#f8faff;display:flex;flex-direction:column;align-items:center;gap:5px}
+.uzone input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.uicon{font-size:28px}.utitle{font-size:14px;font-weight:600;color:#1a1a2e}.usub{font-size:11px;color:#888}
+.cwrap{width:100%;border-radius:8px;overflow:hidden;background:#111;margin:8px 0}
+canvas{display:block;width:100%;height:auto;touch-action:none}
+canvas.free{touch-action:pan-x pan-y pinch-zoom}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .field{display:flex;flex-direction:column;gap:3px}
 .field label{font-size:11px;color:#666}
 .field input{font-size:14px;padding:7px 10px;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#1a1a2e;width:100%}
 .field input:focus{outline:none;border-color:#0B2545}
-.btn{width:100%;padding:12px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px}
+.btn{width:100%;padding:11px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px}
 .btn-primary{background:#0B2545;color:#fff}
 .btn-primary:disabled{opacity:.35;cursor:not-allowed}
 .btn-ghost{background:#fff;color:#555;border:1.5px solid #ddd}
 .btn-blue{background:#fff;color:#378ADD;border:2px solid #378ADD}
 .btn-blue.on{background:#378ADD;color:#fff}
 .btn-amber{background:#fff;color:#854F0B;border:1.5px solid #BA7517}
+.btnrow{display:flex;gap:6px;margin-top:6px}
+.btnrow .btn{margin-top:0}
 .checks{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
 .chk{font-size:11px;padding:6px 10px;border-radius:7px;display:flex;align-items:flex-start;gap:7px;line-height:1.4}
-.chk.ok{background:#E1F5EE;color:#0F6E56}
-.chk.bad{background:#FCEBEB;color:#A32D2D}
+.chk.ok{background:#E1F5EE;color:#0F6E56}.chk.bad{background:#FCEBEB;color:#A32D2D}
 .mrow{display:flex;gap:6px;margin-bottom:6px}
 .mbtn{flex:1;padding:8px 4px;font-size:11px;font-weight:700;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#777;cursor:pointer;text-align:center}
 .mbtn.sel{background:#0B2545;color:#fff;border-color:#0B2545}
@@ -53,16 +49,16 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom;cursor:default}
 .mval{font-size:26px;font-weight:800;line-height:1}
 .mval.ok{color:#1D9E75}.mval.warn{color:#BA7517}.mval.bad{color:#E24B4A}
 .mdet{font-size:10px;color:#bbb;margin-top:2px}
-.status{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:7px;font-size:12px;font-weight:600;margin-bottom:4px}
-.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.status.ok{background:#E1F5EE;color:#0F6E56}.status.ok .sdot{background:#1D9E75}
-.status.warn{background:#FAEEDA;color:#854F0B}.status.warn .sdot{background:#BA7517}
-.status.bad{background:#FCEBEB;color:#A32D2D}.status.bad .sdot{background:#E24B4A}
+.sts{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:7px;font-size:12px;font-weight:600;margin-bottom:4px}
+.stsdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sts.ok{background:#E1F5EE;color:#0F6E56}.sts.ok .stsdot{background:#1D9E75}
+.sts.warn{background:#FAEEDA;color:#854F0B}.sts.warn .stsdot{background:#BA7517}
+.sts.bad{background:#FCEBEB;color:#A32D2D}.sts.bad .stsdot{background:#E24B4A}
 .obs{background:#f8f9fa;border-radius:8px;padding:10px;font-size:12px;color:#555;line-height:1.6;margin:8px 0}
 .disc{font-size:10px;color:#bbb;text-align:center;line-height:1.6;margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0}
 .disc a{color:#0B2545;text-decoration:none}
-.hidden{display:none!important}
 .sep{height:1px;background:#f0f0f0;margin:8px 0}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
@@ -76,17 +72,17 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom;cursor:default}
     <div class="app-sub">S/N · Tailing Factor · USP/EP · orientativo</div>
   </div>
 
-  <!-- PASO 1 -->
+  <!-- CARD 1: PICO -->
   <div class="card" id="card1">
-    <div class="card-title"><div class="stepdot active" id="dot1">1</div>Foto del pico</div>
+    <div class="card-title"><div class="sdot active" id="dot1">1</div>Foto del pico</div>
 
-    <!-- FASE A: upload -->
-    <div id="ph-upload">
+    <!-- A: upload -->
+    <div id="ph-A">
       <div class="checks">
-        <div class="chk ok"><span>✓</span>Integrá el pico primero — la línea de base debe ser visible en pantalla</div>
-        <div class="chk ok"><span>✓</span>El pico de interés debe verse completo con la escala Y legible</div>
+        <div class="chk ok"><span>✓</span>Integrá el pico primero — la línea de base debe ser visible</div>
+        <div class="chk ok"><span>✓</span>El pico debe verse completo con la escala Y legible</div>
       </div>
-      <div class="upload-zone">
+      <div class="uzone">
         <input type="file" id="file-peak" accept="image/*">
         <div class="uicon">📷</div>
         <div class="utitle">Foto de la zona del pico</div>
@@ -94,29 +90,29 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom;cursor:default}
       </div>
     </div>
 
-    <!-- FASE B: selección de ventana -->
-    <div id="ph-select" class="hidden">
+    <!-- B: selección en X -->
+    <div id="ph-B" class="hidden">
       <div id="peak-checks" class="checks"></div>
-      <div id="ph-select-area" class="hidden">
-        <div class="hint" id="hint-select">Arrastrá sobre el pico de interés para seleccionarlo.</div>
-        <div class="canvas-wrap"><canvas id="peak-canvas-full"></canvas></div>
-        <div style="display:flex;gap:6px;margin-top:6px">
-          <button class="btn btn-amber" onclick="redoSelect()" style="flex:1;margin:0">↩ Redibujar ventana</button>
-          <button class="btn btn-ghost" onclick="changePeakPhoto()" style="flex:1;margin:0">📷 Cambiar foto</button>
+      <div id="ph-B-area" class="hidden">
+        <div class="hint" id="hint-B">Arrastrá sobre el pico de interés (solo en horizontal).</div>
+        <div class="cwrap"><canvas id="cv-full"></canvas></div>
+        <div class="btnrow">
+          <button class="btn btn-amber" onclick="redoB()" style="flex:1">↩ Redibujar</button>
+          <button class="btn btn-ghost" onclick="resetPeak()" style="flex:1">📷 Cambiar foto</button>
         </div>
-        <button class="btn btn-primary" id="btn-crop" onclick="doCrop()" disabled style="margin-top:8px">Ampliar pico seleccionado →</button>
+        <button class="btn btn-primary" id="btn-ampliar" onclick="doCrop()" disabled>Ampliar pico seleccionado →</button>
       </div>
     </div>
 
-    <!-- FASE C: crop + línea de base -->
-    <div id="ph-draw" class="hidden">
-      <div class="hint" id="hint-draw">Trazá la línea de base con el dedo de izquierda a derecha.</div>
-      <div class="canvas-wrap"><canvas id="peak-canvas-crop"></canvas></div>
-      <button class="btn btn-blue" id="btn-draw-bl" onclick="toggleDraw()">✏ Trazar línea de base</button>
-      <div style="display:flex;gap:6px;margin-top:6px">
-        <button class="btn btn-amber" onclick="redoDraw()" style="flex:1;margin:0">↩ Redibujar línea de base</button>
-        <button class="btn btn-amber" onclick="redoSelect()" style="flex:1;margin:0">↩ Redibujar ventana</button>
-        <button class="btn btn-ghost" onclick="changePeakPhoto()" style="flex:1;margin:0">📷 Cambiar foto</button>
+    <!-- C: crop + línea de base -->
+    <div id="ph-C" class="hidden">
+      <div class="hint" id="hint-C">Trazá la línea de base con el dedo.</div>
+      <div class="cwrap"><canvas id="cv-crop"></canvas></div>
+      <button class="btn btn-blue" id="btn-draw" onclick="toggleDraw()">✏ Trazar línea de base</button>
+      <div class="btnrow" style="margin-top:6px">
+        <button class="btn btn-amber" onclick="redoC()" style="flex:1">↩ Redibujar línea de base</button>
+        <button class="btn btn-amber" onclick="redoB()" style="flex:1">↩ Redibujar ventana</button>
+        <button class="btn btn-ghost" onclick="resetPeak()" style="flex:1">📷 Cambiar foto</button>
       </div>
       <div class="sep"></div>
       <div class="row2">
@@ -127,28 +123,28 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom;cursor:default}
     </div>
   </div>
 
-  <!-- PASO 2 -->
+  <!-- CARD 2: RUIDO -->
   <div class="card hidden" id="card2">
-    <div class="card-title"><div class="stepdot" id="dot2">2</div>Foto del ruido</div>
-    <div id="nh-upload">
+    <div class="card-title"><div class="sdot" id="dot2">2</div>Foto del ruido</div>
+    <div id="nh-A">
       <div class="checks">
         <div class="chk ok"><span>✓</span>Zoom en línea base sin pico — fluctuación visible con escala Y legible</div>
       </div>
-      <div class="upload-zone">
+      <div class="uzone">
         <input type="file" id="file-noise" accept="image/*">
         <div class="uicon">📷</div>
         <div class="utitle">Foto del ruido</div>
         <div class="usub">PNG o JPG · línea base sin pico</div>
       </div>
     </div>
-    <div id="nh-editor" class="hidden">
+    <div id="nh-B" class="hidden">
       <div id="noise-checks" class="checks"></div>
-      <div id="nh-area" class="hidden">
-        <div class="hint" id="hint-noise">Arrastrá para seleccionar la región de ruido.</div>
-        <div class="canvas-wrap"><canvas id="noise-canvas"></canvas></div>
-        <div style="display:flex;gap:6px;margin-top:6px">
-          <button class="btn btn-amber" onclick="redoNoise()" style="flex:1;margin:0">↩ Redibujar selección</button>
-          <button class="btn btn-ghost" onclick="changeNoisePhoto()" style="flex:1;margin:0">📷 Cambiar foto</button>
+      <div id="nh-B-area" class="hidden">
+        <div class="hint" id="hint-N">Arrastrá para seleccionar la región de ruido.</div>
+        <div class="cwrap"><canvas id="cv-noise"></canvas></div>
+        <div class="btnrow">
+          <button class="btn btn-amber" onclick="redoN()" style="flex:1">↩ Redibujar</button>
+          <button class="btn btn-ghost" onclick="resetNoise()" style="flex:1">📷 Cambiar foto</button>
         </div>
         <div class="row2">
           <div class="field"><label>Escala Y máximo</label><input type="number" id="noise-ymax" placeholder="ej: 8000"></div>
@@ -159,13 +155,13 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom;cursor:default}
     </div>
   </div>
 
-  <!-- PASO 3 -->
+  <!-- CARD 3: MÉTODO -->
   <div class="card hidden" id="card3">
-    <div class="card-title"><div class="stepdot" id="dot3">3</div>Método S/N</div>
+    <div class="card-title"><div class="sdot" id="dot3">3</div>Método S/N</div>
     <div class="mrow">
       <div class="mbtn sel" id="m-usp" onclick="selM('usp')">USP &lt;621&gt;</div>
-      <div class="mbtn" id="m-ep" onclick="selM('ep')">EP 2.2.46</div>
-      <div class="mbtn" id="m-pp" onclick="selM('pp')">Peak-to-peak</div>
+      <div class="mbtn" id="m-ep"  onclick="selM('ep')">EP 2.2.46</div>
+      <div class="mbtn" id="m-pp"  onclick="selM('pp')">Peak-to-peak</div>
     </div>
     <div class="mdesc" id="mdesc">S/N = 2H/h. H = altura desde la línea de base. h = amplitud pico-a-pico del ruido.</div>
     <button class="btn btn-primary" style="margin-top:10px" onclick="calculate()">Calcular S/N y Tailing Factor</button>
@@ -176,552 +172,514 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom;cursor:default}
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────
-var P = {
-  src: null,        // offscreen canvas (full image)
-  curve: null,      // full image curve
-  pa: null,         // plot area in full image
-  sel: null,        // {x1,y1,x2,y2} selection in full canvas coords
-  cropSrc: null,    // offscreen canvas (cropped)
-  cropCurve: null,  // curve of cropped image
-  cropPA: null,     // plot area of cropped image
-  bl: null,         // baseline in crop canvas coords {x1,y1,x2,y2}
-  pk: null,         // peak data
-  ctx_full: null,
-  ctx_crop: null,
-  ymax: null, ymin: null
-};
-var N = {
-  src: null, curve: null, pa: null,
-  sel: null, ns: null, ctx: null,
-  ymax: null, ymin: null
-};
-var drag = { on: false, which: null, sx: 0, sy: 0, ex: 0, ey: 0 };
-var peakPhase = 'upload'; // upload | select | draw
+var P = { src:null, pa:null, curve:null, selX:null,
+          cropSrc:null, cropCurve:null,
+          bl:null, pk:null,
+          ctx_full:null, ctx_crop:null,
+          ymax:null, ymin:null };
+var N = { src:null, pa:null, curve:null, sel:null, ns:null, ctx:null, ymax:null, ymin:null };
+var drag = { on:false, which:null, sx:0, sy:0, ex:0, ey:0 };
 var drawMode = false;
 var method = 'usp';
+var _bound = {};
 
 var MDESC = {
-  usp: 'S/N = 2H/h. H = altura desde la línea de base. h = amplitud pico-a-pico del ruido.',
-  ep:  'S/N = 2H/h. Ruido en región adyacente ≥20× ancho del pico.',
-  pp:  'S/N = H/(h/2). Ruido como amplitud total pico-a-pico.'
+  usp:'S/N = 2H/h. H = altura desde la línea de base. h = amplitud pico-a-pico del ruido.',
+  ep: 'S/N = 2H/h. Ruido en región adyacente ≥20× ancho del pico.',
+  pp: 'S/N = H/(h/2). Ruido como amplitud total pico-a-pico.'
 };
 
-function selM(m) {
-  method = m;
-  ['usp','ep','pp'].forEach(function(x){ document.getElementById('m-'+x).classList.toggle('sel', x===m); });
-  document.getElementById('mdesc').textContent = MDESC[m];
+function selM(m){
+  method=m;
+  ['usp','ep','pp'].forEach(function(x){document.getElementById('m-'+x).classList.toggle('sel',x===m);});
+  document.getElementById('mdesc').textContent=MDESC[m];
 }
 
 // ── FILE INPUTS ────────────────────────────────────────────────
-document.getElementById('file-peak').addEventListener('change', function(){
-  if (this.files && this.files[0]) loadImg('peak', this.files[0]);
+document.getElementById('file-peak').addEventListener('change',function(){
+  if(this.files&&this.files[0])readImg('peak',this.files[0]);
 });
-document.getElementById('file-noise').addEventListener('change', function(){
-  if (this.files && this.files[0]) loadImg('noise', this.files[0]);
+document.getElementById('file-noise').addEventListener('change',function(){
+  if(this.files&&this.files[0])readImg('noise',this.files[0]);
 });
 
-function changePeakPhoto() {
-  P = { src:null, curve:null, pa:null, sel:null, cropSrc:null, cropCurve:null, cropPA:null, bl:null, pk:null, ctx_full:null, ctx_crop:null, ymax:null, ymin:null };
-  drawMode = false;
-  peakPhase = 'upload';
-  document.getElementById('file-peak').value = '';
-  document.getElementById('ph-upload').classList.remove('hidden');
-  document.getElementById('ph-select').classList.add('hidden');
-  document.getElementById('ph-draw').classList.add('hidden');
-}
-
-function changeNoisePhoto() {
-  N = { src:null, curve:null, pa:null, sel:null, ns:null, ctx:null, ymax:null, ymin:null };
-  document.getElementById('file-noise').value = '';
-  document.getElementById('nh-upload').classList.remove('hidden');
-  document.getElementById('nh-editor').classList.add('hidden');
-  document.getElementById('nh-area').classList.add('hidden');
-}
-
-// ── IMAGE LOADING ──────────────────────────────────────────────
-function loadImg(w, file) {
-  var url = URL.createObjectURL(file);
-  var img = new Image();
-  img.onload = function() {
-    var oc = document.createElement('canvas');
-    var sc = Math.min(1, 1200 / img.width);
-    oc.width  = Math.round(img.width  * sc);
-    oc.height = Math.round(img.height * sc);
-    var octx = oc.getContext('2d', { willReadFrequently: true });
-    octx.drawImage(img, 0, 0, oc.width, oc.height);
+function readImg(which, file){
+  var url=URL.createObjectURL(file);
+  var img=new Image();
+  img.onload=function(){
+    var oc=document.createElement('canvas');
+    var sc=Math.min(1,1200/img.width);
+    oc.width=Math.round(img.width*sc);
+    oc.height=Math.round(img.height*sc);
+    var ctx=oc.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(img,0,0,oc.width,oc.height);
     URL.revokeObjectURL(url);
-    if (w === 'peak') {
-      P.src = oc;
-      processPeakFull();
-    } else {
-      N.src = oc;
-      processNoise();
-    }
+    if(which==='peak'){P.src=oc;initPeakFull();}
+    else{N.src=oc;initNoise();}
   };
-  img.src = url;
+  img.src=url;
 }
 
-// ── PEAK FULL IMAGE ────────────────────────────────────────────
-function processPeakFull() {
-  document.getElementById('ph-upload').classList.add('hidden');
-  document.getElementById('ph-select').classList.remove('hidden');
-  var chkDiv = document.getElementById('peak-checks');
-  chkDiv.innerHTML = '<div class="chk ok"><span>⏳</span>Analizando imagen...</div>';
-
-  setTimeout(function() {
-    var pa = detectPA(P.src);
-    var curve = extractCurve(P.src, pa);
-    P.pa = pa; P.curve = curve;
-
-    var valid = curve.filter(function(v){ return v !== null; });
-    var checks = [];
-    if ((pa.w * pa.h) / (P.src.width * P.src.height) < 0.12) {
-      checks.push({ cls:'bad', t:'El gráfico ocupa muy poco — acercate más a la pantalla' });
-    } else {
-      checks.push({ cls:'ok', t:'Área del gráfico detectada' });
-    }
-    if (valid.length < pa.w * 0.2) {
-      checks.push({ cls:'bad', t:'No se detecta trazo — verificá la foto' });
-    } else {
-      checks.push({ cls:'ok', t:'Trazo del cromatograma detectado' });
-    }
-    chkDiv.innerHTML = checks.map(function(c){
-      return '<div class="chk '+c.cls+'"><span>'+(c.cls==='ok'?'✓':'✗')+'</span>'+c.t+'</div>';
-    }).join('');
-
-    if (checks.some(function(c){ return c.cls === 'bad'; })) return;
-
-    document.getElementById('ph-select-area').classList.remove('hidden');
-    peakPhase = 'select';
-    setupFullCanvas();
-  }, 50);
+// ── RESET ──────────────────────────────────────────────────────
+function resetPeak(){
+  P={src:null,pa:null,curve:null,selX:null,cropSrc:null,cropCurve:null,bl:null,pk:null,ctx_full:null,ctx_crop:null,ymax:null,ymin:null};
+  drawMode=false;
+  delete _bound['full']; delete _bound['crop'];
+  document.getElementById('file-peak').value='';
+  show('ph-A'); hide('ph-B'); hide('ph-C');
 }
 
-function setupFullCanvas() {
-  var el = document.getElementById('peak-canvas-full');
-  el.width  = P.src.width;
-  el.height = P.src.height;
-  var ctx = el.getContext('2d', { willReadFrequently: true });
-  ctx.drawImage(P.src, 0, 0);
-  P.ctx_full = ctx;
-  drawBorderOn(ctx, P.pa);
-  el.classList.remove('free', 'drawing');
-  el.classList.add('selecting');
-  bindCanvas('full', el);
-  document.getElementById('hint-select').textContent = 'Arrastrá sobre el pico de interés para seleccionarlo.';
-  document.getElementById('btn-crop').disabled = true;
+function resetNoise(){
+  N={src:null,pa:null,curve:null,sel:null,ns:null,ctx:null,ymax:null,ymin:null};
+  delete _bound['noise'];
+  document.getElementById('file-noise').value='';
+  show('nh-A'); hide('nh-B');
 }
 
-function redoSelect() {
-  P.sel = null; P.bl = null; P.pk = null; P.cropSrc = null;
-  drawMode = false;
-  document.getElementById('ph-draw').classList.add('hidden');
-  document.getElementById('ph-select').classList.remove('hidden');
-  document.getElementById('ph-select-area').classList.remove('hidden');
-  document.getElementById('btn-peak-ok').disabled = true;
+function redoB(){
+  // back to full image selection
+  P.selX=null; P.bl=null; P.pk=null; P.cropSrc=null; P.cropCurve=null;
+  drawMode=false;
+  delete _bound['crop'];
+  hide('ph-C'); show('ph-B'); show('ph-B-area');
+  document.getElementById('btn-peak-ok').disabled=true;
   setupFullCanvas();
 }
 
-// ── CROP ───────────────────────────────────────────────────────
-function doCrop() {
-  if (!P.sel) return;
-  var s = P.sel;
-  // Add padding
-  var pad = 20;
-  var cx1 = Math.max(0, s.x1 - pad);
-  var cy1 = Math.max(0, s.y1 - pad);
-  var cx2 = Math.min(P.src.width,  s.x2 + pad);
-  var cy2 = Math.min(P.src.height, s.y2 + pad);
-  var cw = cx2 - cx1, ch = cy2 - cy1;
-
-  var oc = document.createElement('canvas');
-  oc.width = cw; oc.height = ch;
-  var octx = oc.getContext('2d', { willReadFrequently: true });
-  octx.drawImage(P.src, cx1, cy1, cw, ch, 0, 0, cw, ch);
-
-  P.cropSrc = oc;
-  P.cropPA  = { x: 0, y: 0, w: cw, h: ch, bg: P.pa.bg };
-  P.cropCurve = extractCurve(oc, P.cropPA);
-
-  document.getElementById('ph-select').classList.add('hidden');
-  document.getElementById('ph-draw').classList.remove('hidden');
-  peakPhase = 'draw';
-
+function redoC(){
+  P.bl=null; P.pk=null;
+  drawMode=false;
+  document.getElementById('btn-peak-ok').disabled=true;
   setupCropCanvas();
 }
 
-function setupCropCanvas() {
-  var el = document.getElementById('peak-canvas-crop');
-  el.width  = P.cropSrc.width;
-  el.height = P.cropSrc.height;
-  var ctx = el.getContext('2d', { willReadFrequently: true });
-  ctx.drawImage(P.cropSrc, 0, 0);
-  P.ctx_crop = ctx;
-  el.classList.remove('selecting', 'drawing');
-  el.classList.add('free');
-  bindCanvas('crop', el);
-  document.getElementById('hint-draw').textContent = 'Trazá la línea de base con o sin zoom. Tocá "Trazar línea de base" cuando estés listo.';
-  document.getElementById('btn-draw-bl').classList.remove('on');
-  document.getElementById('btn-draw-bl').textContent = '✏ Trazar línea de base';
-  document.getElementById('btn-peak-ok').disabled = true;
-}
-
-function redoDraw() {
-  P.bl = null; P.pk = null;
-  drawMode = false;
-  setupCropCanvas();
-}
-
-// ── CANVAS BINDING ─────────────────────────────────────────────
-var _bound = {};
-function bindCanvas(id, el) {
-  if (_bound[id]) return;
-  _bound[id] = true;
-  el.addEventListener('mousedown',  function(e){ onDown(e, id); }, false);
-  el.addEventListener('mousemove',  function(e){ onMove(e, id); }, false);
-  el.addEventListener('mouseup',    function(e){ onUp(e, id);   }, false);
-  el.addEventListener('touchstart', function(e){
-    if (e.touches.length === 1 && shouldIntercept(id)) {
-      e.preventDefault(); onDown(e.touches[0], id);
-    }
-  }, { passive: false });
-  el.addEventListener('touchmove', function(e){
-    if (drag.on && drag.which === id) { e.preventDefault(); onMove(e.touches[0], id); }
-  }, { passive: false });
-  el.addEventListener('touchend', function(e){
-    if (drag.on && drag.which === id) { e.preventDefault(); onUp(e.changedTouches[0], id); }
-  }, { passive: false });
-}
-
-function shouldIntercept(id) {
-  if (id === 'full')  return true;
-  if (id === 'crop')  return drawMode;
-  if (id === 'noise') return true;
-  return false;
-}
-
-function gp(e, id) {
-  var elId = id === 'full' ? 'peak-canvas-full' : id === 'crop' ? 'peak-canvas-crop' : 'noise-canvas';
-  var el = document.getElementById(elId);
-  var r  = el.getBoundingClientRect();
-  return {
-    x: (e.clientX - r.left) * (el.width  / r.width),
-    y: (e.clientY - r.top)  * (el.height / r.height)
-  };
-}
-
-function onDown(e, id) {
-  var p = gp(e, id);
-  drag = { on: true, which: id, sx: p.x, sy: p.y, ex: p.x, ey: p.y };
-}
-function onMove(e, id) {
-  if (!drag.on || drag.which !== id) return;
-  var p = gp(e, id);
-  drag.ex = p.x; drag.ey = p.y;
-  if (id === 'full')  redrawFull(true);
-  if (id === 'crop')  redrawCrop(true);
-  if (id === 'noise') redrawNoise(true);
-}
-function onUp(e, id) {
-  if (!drag.on) return;
-  drag.on = false;
-  if (id === 'full')  commitSelect();
-  if (id === 'crop')  commitBL();
-  if (id === 'noise') commitNoise();
-}
-
-// ── FULL CANVAS DRAW ───────────────────────────────────────────
-function redrawFull(dragging) {
-  var ctx = P.ctx_full;
-  ctx.drawImage(P.src, 0, 0);
-  drawBorderOn(ctx, P.pa);
-  if (P.sel && !dragging) drawSelection(ctx, P.sel);
-  if (dragging) {
-    var x1=Math.min(drag.sx,drag.ex), y1=Math.min(drag.sy,drag.ey);
-    var x2=Math.max(drag.sx,drag.ex), y2=Math.max(drag.sy,drag.ey);
-    ctx.fillStyle = 'rgba(29,158,117,0.15)';
-    ctx.fillRect(x1, y1, x2-x1, y2-y1);
-    ctx.strokeStyle = '#1D9E75'; ctx.lineWidth = 2; ctx.setLineDash([4,3]);
-    ctx.strokeRect(x1, y1, x2-x1, y2-y1);
-    ctx.setLineDash([]);
-  }
-}
-
-function drawSelection(ctx, sel) {
-  ctx.fillStyle = 'rgba(29,158,117,0.15)';
-  ctx.fillRect(sel.x1, sel.y1, sel.x2-sel.x1, sel.y2-sel.y1);
-  ctx.strokeStyle = '#1D9E75'; ctx.lineWidth = 2.5;
-  ctx.strokeRect(sel.x1, sel.y1, sel.x2-sel.x1, sel.y2-sel.y1);
-}
-
-function commitSelect() {
-  var x1=Math.min(drag.sx,drag.ex), y1=Math.min(drag.sy,drag.ey);
-  var x2=Math.max(drag.sx,drag.ex), y2=Math.max(drag.sy,drag.ey);
-  if (x2-x1 < 10 || y2-y1 < 10) return;
-  P.sel = { x1:x1, y1:y1, x2:x2, y2:y2 };
-  redrawFull(false);
-  document.getElementById('btn-crop').disabled = false;
-  document.getElementById('hint-select').textContent = '✓ Pico seleccionado. Tocá "Ampliar" o redibujá la ventana.';
-}
-
-// ── CROP CANVAS DRAW ───────────────────────────────────────────
-function toggleDraw() {
-  drawMode = !drawMode;
-  var el  = document.getElementById('peak-canvas-crop');
-  var btn = document.getElementById('btn-draw-bl');
-  if (drawMode) {
-    el.classList.remove('free'); el.classList.add('drawing');
-    btn.classList.add('on');
-    btn.textContent = '✏ Dibujando... arrastrá sobre la línea de base';
-    document.getElementById('hint-draw').textContent = 'Modo dibujo activo — arrastrá de izq a der sobre la línea de base del pico.';
-  } else {
-    el.classList.remove('drawing'); el.classList.add('free');
-    btn.classList.remove('on');
-    btn.textContent = P.bl ? '✏ Redibujar línea de base' : '✏ Trazar línea de base';
-    document.getElementById('hint-draw').textContent = P.bl ? '✓ Línea de base trazada. Verificá o redibujá si es necesario.' : 'Activá el modo dibujo para trazar la línea de base.';
-  }
-}
-
-function redrawCrop(dragging) {
-  var ctx = P.ctx_crop;
-  ctx.drawImage(P.cropSrc, 0, 0);
-  if (P.bl && !dragging) drawBLCommitted();
-  if (dragging && drawMode) {
-    ctx.strokeStyle = 'rgba(55,138,221,0.8)'; ctx.lineWidth = 2.5; ctx.setLineDash([5,3]);
-    ctx.beginPath(); ctx.moveTo(drag.sx, drag.sy); ctx.lineTo(drag.ex, drag.ey); ctx.stroke();
-    ctx.setLineDash([]);
-  }
-}
-
-function commitBL() {
-  if (!drawMode) return;
-  var x1 = Math.min(drag.sx, drag.ex), y1 = drag.sx < drag.ex ? drag.sy : drag.ey;
-  var x2 = Math.max(drag.sx, drag.ex), y2 = drag.sx < drag.ex ? drag.ey : drag.sy;
-  if (x2 - x1 < 8) { toggleDraw(); return; }
-
-  var curve = P.cropCurve;
-  var cw    = P.cropSrc.width, ch = P.cropSrc.height;
-  var i1    = Math.max(0, Math.round(x1));
-  var i2    = Math.min(curve.length-1, Math.round(x2));
-  var maxV  = -Infinity, maxI = i1;
-  for (var i = i1; i <= i2; i++) {
-    if (curve[i] !== null && curve[i] > maxV) { maxV = curve[i]; maxI = i; }
-  }
-
-  var apX   = maxI;
-  var apY   = (1 - maxV) * ch;
-  var frac  = (x2-x1) > 0 ? (apX - x1) / (x2 - x1) : 0.5;
-  frac = Math.max(0, Math.min(1, frac));
-  var baseY = y1 + frac * (y2 - y1);
-  var baseNorm = 1 - baseY / ch;
-  if (baseY < apY) baseY = apY + 10;
-
-  P.bl = { x1:x1, y1:y1, x2:x2, y2:y2 };
-  P.pk = { maxV:maxV, maxI:maxI, baseNorm:baseNorm, baseY:baseY, apY:apY, i1:i1, i2:i2 };
-
-  drawMode = false;
-  var el = document.getElementById('peak-canvas-crop');
-  el.classList.remove('drawing'); el.classList.add('free');
-  var btn = document.getElementById('btn-draw-bl');
-  btn.classList.remove('on');
-  btn.textContent = '✏ Redibujar línea de base';
-  document.getElementById('hint-draw').textContent = '✓ Línea de base trazada. Verificá o redibujá si es necesario.';
-  document.getElementById('btn-peak-ok').disabled = false;
-  redrawCrop(false);
-  drawBLCommitted();
-}
-
-function drawBLCommitted() {
-  var ctx = P.ctx_crop, bl = P.bl, pk = P.pk, ch = P.cropSrc.height;
-  if (!bl || !pk) return;
-  // Línea de base azul
-  ctx.strokeStyle = '#378ADD'; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(bl.x1, bl.y1); ctx.lineTo(bl.x2, bl.y2); ctx.stroke();
-  ctx.fillStyle = '#378ADD';
-  ctx.beginPath(); ctx.arc(bl.x1, bl.y1, 5, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(bl.x2, bl.y2, 5, 0, Math.PI*2); ctx.fill();
-  // Ápex rojo
-  var apX = pk.maxI;
-  ctx.fillStyle = '#E24B4A';
-  ctx.beginPath(); ctx.arc(apX, pk.apY, 6, 0, Math.PI*2); ctx.fill();
-  // H rojo
-  ctx.strokeStyle = '#E24B4A'; ctx.lineWidth = 3; ctx.setLineDash([4,3]);
-  ctx.beginPath(); ctx.moveTo(apX, pk.apY); ctx.lineTo(apX, pk.baseY); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#E24B4A'; ctx.font = 'bold 15px sans-serif';
-  ctx.fillText('H', apX + 8, (pk.apY + pk.baseY) / 2 + 5);
-}
-
-// ── NOISE ──────────────────────────────────────────────────────
-function processNoise() {
-  document.getElementById('nh-upload').classList.add('hidden');
-  document.getElementById('nh-editor').classList.remove('hidden');
-  var chkDiv = document.getElementById('noise-checks');
-  chkDiv.innerHTML = '<div class="chk ok"><span>⏳</span>Analizando imagen...</div>';
-  setTimeout(function() {
-    var pa = detectPA(N.src);
-    var curve = extractCurve(N.src, pa);
-    N.pa = pa; N.curve = curve;
-    var valid = curve.filter(function(v){ return v !== null; });
-    var checks = [];
-    if ((pa.w*pa.h)/(N.src.width*N.src.height) < 0.12)
-      checks.push({ cls:'bad', t:'El gráfico ocupa muy poco' });
-    else checks.push({ cls:'ok', t:'Área del gráfico detectada' });
-    if (valid.length < pa.w * 0.2)
-      checks.push({ cls:'bad', t:'No se detecta trazo' });
-    else checks.push({ cls:'ok', t:'Trazo detectado' });
-    chkDiv.innerHTML = checks.map(function(c){
-      return '<div class="chk '+c.cls+'"><span>'+(c.cls==='ok'?'✓':'✗')+'</span>'+c.t+'</div>';
-    }).join('');
-    if (checks.some(function(c){ return c.cls === 'bad'; })) return;
-    document.getElementById('nh-area').classList.remove('hidden');
-    setupNoiseCanvas();
-  }, 50);
-}
-
-function setupNoiseCanvas() {
-  var el = document.getElementById('noise-canvas');
-  el.width  = N.src.width;
-  el.height = N.src.height;
-  var ctx = el.getContext('2d', { willReadFrequently: true });
-  ctx.drawImage(N.src, 0, 0);
-  N.ctx = ctx;
-  drawBorderOn(ctx, N.pa);
-  el.classList.add('selecting');
-  bindCanvas('noise', el);
-  document.getElementById('hint-noise').textContent = 'Arrastrá para seleccionar la región de ruido.';
-  document.getElementById('btn-noise-ok').disabled = true;
-}
-
-function redoNoise() {
-  N.sel = null; N.ns = null;
+function redoN(){
+  N.sel=null; N.ns=null;
+  document.getElementById('btn-noise-ok').disabled=true;
   setupNoiseCanvas();
 }
 
-function redrawNoise(dragging) {
-  var ctx = N.ctx, pa = N.pa;
-  ctx.drawImage(N.src, 0, 0);
-  drawBorderOn(ctx, pa);
-  if (dragging && drag.on) {
-    var x1=Math.min(drag.sx,drag.ex), x2=Math.max(drag.sx,drag.ex);
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.fillRect(pa.x, pa.y, x1-pa.x, pa.h);
-    ctx.fillRect(x2, pa.y, pa.x+pa.w-x2, pa.h);
-    ctx.fillStyle = 'rgba(186,117,23,0.15)';
-    ctx.fillRect(x1, pa.y, x2-x1, pa.h);
-    ctx.strokeStyle = '#BA7517'; ctx.lineWidth = 2; ctx.setLineDash([4,3]);
-    ctx.beginPath(); ctx.moveTo(x1, pa.y); ctx.lineTo(x1, pa.y+pa.h); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x2, pa.y); ctx.lineTo(x2, pa.y+pa.h); ctx.stroke();
+function show(id){document.getElementById(id).classList.remove('hidden');}
+function hide(id){document.getElementById(id).classList.add('hidden');}
+
+// ── PEAK FULL IMAGE INIT ───────────────────────────────────────
+function initPeakFull(){
+  hide('ph-A'); show('ph-B');
+  var chkDiv=document.getElementById('peak-checks');
+  chkDiv.innerHTML='<div class="chk ok"><span>⏳</span>Analizando imagen...</div>';
+  setTimeout(function(){
+    var pa=detectPA(P.src);
+    var curve=extractCurve(P.src,pa);
+    P.pa=pa; P.curve=curve;
+    var valid=curve.filter(function(v){return v!==null;});
+    var checks=[];
+    if((pa.w*pa.h)/(P.src.width*P.src.height)<0.12)
+      checks.push({cls:'bad',t:'El gráfico ocupa muy poco — acercate más'});
+    else checks.push({cls:'ok',t:'Área del gráfico detectada'});
+    if(valid.length<pa.w*0.2)
+      checks.push({cls:'bad',t:'No se detecta trazo — verificá la foto'});
+    else checks.push({cls:'ok',t:'Trazo del cromatograma detectado'});
+    chkDiv.innerHTML=checks.map(function(c){
+      return '<div class="chk '+c.cls+'"><span>'+(c.cls==='ok'?'✓':'✗')+'</span>'+c.t+'</div>';
+    }).join('');
+    if(checks.some(function(c){return c.cls==='bad';}))return;
+    show('ph-B-area');
+    setupFullCanvas();
+  },50);
+}
+
+function setupFullCanvas(){
+  var el=document.getElementById('cv-full');
+  el.width=P.src.width; el.height=P.src.height;
+  el.className=''; // reset classes, touch-action:none via default
+  var ctx=el.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(P.src,0,0);
+  P.ctx_full=ctx;
+  drawBorder(ctx,P.pa);
+  bindEv('full',el);
+  document.getElementById('btn-ampliar').disabled=true;
+  document.getElementById('hint-B').textContent='Arrastrá de izquierda a derecha sobre el pico de interés.';
+}
+
+// ── CROP ───────────────────────────────────────────────────────
+function doCrop(){
+  if(!P.selX)return;
+  var pa=P.pa;
+  var pad=Math.round(pa.w*0.02);
+  var cx1=Math.max(pa.x, P.selX.x1-pad);
+  var cx2=Math.min(pa.x+pa.w, P.selX.x2+pad);
+  var cy1=pa.y;
+  var cy2=pa.y+pa.h;
+  var cw=cx2-cx1, ch=cy2-cy1;
+
+  var oc=document.createElement('canvas');
+  oc.width=cw; oc.height=ch;
+  var octx=oc.getContext('2d',{willReadFrequently:true});
+  octx.drawImage(P.src, cx1, cy1, cw, ch, 0, 0, cw, ch);
+  P.cropSrc=oc;
+
+  // Extract curve from crop (full crop area)
+  var cropPA={x:0,y:0,w:cw,h:ch,bg:P.pa.bg};
+  P.cropCurve=extractCurve(oc,cropPA);
+
+  hide('ph-B'); show('ph-C');
+  setupCropCanvas();
+}
+
+function setupCropCanvas(){
+  var el=document.getElementById('cv-crop');
+  el.width=P.cropSrc.width; el.height=P.cropSrc.height;
+  el.className='free'; // free = pinch-zoom allowed
+  var ctx=el.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(P.cropSrc,0,0);
+  P.ctx_crop=ctx;
+  bindEv('crop',el);
+  drawMode=false;
+  var btn=document.getElementById('btn-draw');
+  btn.classList.remove('on');
+  btn.textContent='✏ Trazar línea de base';
+  document.getElementById('hint-C').textContent='Hacé zoom si querés. Luego trazá la línea de base.';
+  document.getElementById('btn-peak-ok').disabled=true;
+}
+
+function toggleDraw(){
+  drawMode=!drawMode;
+  var el=document.getElementById('cv-crop');
+  var btn=document.getElementById('btn-draw');
+  if(drawMode){
+    el.className=''; // touch-action:none
+    btn.classList.add('on');
+    btn.textContent='✏ Dibujando... arrastrá sobre la línea de base';
+    document.getElementById('hint-C').textContent='Arrastrá con el dedo sobre la línea de base del pico.';
+  } else {
+    el.className='free';
+    btn.classList.remove('on');
+    btn.textContent=P.bl?'✏ Redibujar línea de base':'✏ Trazar línea de base';
+    document.getElementById('hint-C').textContent=P.bl?'✓ Línea de base trazada. Verificá o redibujá.':'Activá el modo dibujo para trazar la línea de base.';
+  }
+}
+
+// ── NOISE INIT ─────────────────────────────────────────────────
+function initNoise(){
+  hide('nh-A'); show('nh-B');
+  var chkDiv=document.getElementById('noise-checks');
+  chkDiv.innerHTML='<div class="chk ok"><span>⏳</span>Analizando imagen...</div>';
+  setTimeout(function(){
+    var pa=detectPA(N.src);
+    var curve=extractCurve(N.src,pa);
+    N.pa=pa; N.curve=curve;
+    var valid=curve.filter(function(v){return v!==null;});
+    var checks=[];
+    if((pa.w*pa.h)/(N.src.width*N.src.height)<0.12)
+      checks.push({cls:'bad',t:'El gráfico ocupa muy poco — acercate más'});
+    else checks.push({cls:'ok',t:'Área del gráfico detectada'});
+    if(valid.length<pa.w*0.2)
+      checks.push({cls:'bad',t:'No se detecta trazo'});
+    else checks.push({cls:'ok',t:'Trazo detectado'});
+    chkDiv.innerHTML=checks.map(function(c){
+      return '<div class="chk '+c.cls+'"><span>'+(c.cls==='ok'?'✓':'✗')+'</span>'+c.t+'</div>';
+    }).join('');
+    if(checks.some(function(c){return c.cls==='bad';}))return;
+    show('nh-B-area');
+    setupNoiseCanvas();
+  },50);
+}
+
+function setupNoiseCanvas(){
+  var el=document.getElementById('cv-noise');
+  el.width=N.src.width; el.height=N.src.height;
+  el.className='';
+  var ctx=el.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(N.src,0,0);
+  N.ctx=ctx;
+  drawBorder(ctx,N.pa);
+  bindEv('noise',el);
+  document.getElementById('hint-N').textContent='Arrastrá para seleccionar la región de ruido.';
+  document.getElementById('btn-noise-ok').disabled=true;
+}
+
+// ── CANVAS EVENTS ─────────────────────────────────────────────
+function bindEv(id,el){
+  if(_bound[id])return;
+  _bound[id]=true;
+  (function(w){
+    el.addEventListener('mousedown', function(e){dn(e,w);},false);
+    el.addEventListener('mousemove', function(e){mv(e,w);},false);
+    el.addEventListener('mouseup',   function(e){up(e,w);},false);
+    el.addEventListener('touchstart',function(e){
+      if(e.touches.length===1&&intercept(w)){e.preventDefault();dn(e.touches[0],w);}
+    },{passive:false});
+    el.addEventListener('touchmove',function(e){
+      if(drag.on&&drag.which===w){e.preventDefault();mv(e.touches[0],w);}
+    },{passive:false});
+    el.addEventListener('touchend',function(e){
+      if(drag.on&&drag.which===w){e.preventDefault();up(e.changedTouches[0],w);}
+    },{passive:false});
+  })(id);
+}
+
+function intercept(id){
+  if(id==='full')return true;
+  if(id==='crop')return drawMode;
+  if(id==='noise')return true;
+  return false;
+}
+
+function gp(e,id){
+  var elId=id==='full'?'cv-full':id==='crop'?'cv-crop':'cv-noise';
+  var el=document.getElementById(elId);
+  var r=el.getBoundingClientRect();
+  return{
+    x:(e.clientX-r.left)*(el.width/r.width),
+    y:(e.clientY-r.top)*(el.height/r.height)
+  };
+}
+
+function dn(e,id){var p=gp(e,id);drag={on:true,which:id,sx:p.x,sy:p.y,ex:p.x,ey:p.y};}
+function mv(e,id){
+  if(!drag.on||drag.which!==id)return;
+  var p=gp(e,id);drag.ex=p.x;drag.ey=p.y;
+  if(id==='full')rdFull(true);
+  else if(id==='crop')rdCrop(true);
+  else rdNoise(true);
+}
+function up(e,id){
+  if(!drag.on)return;
+  drag.on=false;
+  if(id==='full')commitSel();
+  else if(id==='crop')commitBL();
+  else commitNoise();
+}
+
+// ── FULL CANVAS DRAW ───────────────────────────────────────────
+function rdFull(dragging){
+  var ctx=P.ctx_full;
+  ctx.drawImage(P.src,0,0);
+  drawBorder(ctx,P.pa);
+  // Draw existing selection
+  if(P.selX&&!dragging)drawSelX(ctx,P.selX);
+  if(dragging){
+    var x1=Math.min(drag.sx,drag.ex),x2=Math.max(drag.sx,drag.ex);
+    var pa=P.pa;
+    // full height of plot area, only X from drag
+    ctx.fillStyle='rgba(29,158,117,0.2)';
+    ctx.fillRect(x1,pa.y,x2-x1,pa.h);
+    ctx.strokeStyle='#1D9E75';ctx.lineWidth=2;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(x1,pa.y);ctx.lineTo(x1,pa.y+pa.h);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x2,pa.y);ctx.lineTo(x2,pa.y+pa.h);ctx.stroke();
     ctx.setLineDash([]);
   }
-  if (N.sel && !dragging) {
-    var sx1=N.sel.x1, sx2=N.sel.x2;
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.fillRect(pa.x, pa.y, sx1-pa.x, pa.h);
-    ctx.fillRect(sx2, pa.y, pa.x+pa.w-sx2, pa.h);
-    ctx.fillStyle = 'rgba(186,117,23,0.12)';
-    ctx.fillRect(sx1, pa.y, sx2-sx1, pa.h);
-    var hw = 12;
-    ctx.fillStyle = '#BA7517';
-    ctx.fillRect(sx1-hw/2, pa.y, hw, pa.h);
-    ctx.fillRect(sx2-hw/2, pa.y, hw, pa.h);
-    if (N.ns) {
-      var ty = pa.y + (1-N.ns.max)*pa.h, by = pa.y + (1-N.ns.min)*pa.h;
-      ctx.strokeStyle = '#BA7517'; ctx.lineWidth = 1.5; ctx.setLineDash([5,3]);
-      ctx.beginPath(); ctx.moveTo(sx1, ty); ctx.lineTo(sx2, ty); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(sx1, by); ctx.lineTo(sx2, by); ctx.stroke();
+}
+
+function drawSelX(ctx,selX){
+  var pa=P.pa;
+  ctx.fillStyle='rgba(29,158,117,0.18)';
+  ctx.fillRect(selX.x1,pa.y,selX.x2-selX.x1,pa.h);
+  ctx.strokeStyle='#1D9E75';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(selX.x1,pa.y);ctx.lineTo(selX.x1,pa.y+pa.h);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(selX.x2,pa.y);ctx.lineTo(selX.x2,pa.y+pa.h);ctx.stroke();
+}
+
+function commitSel(){
+  var x1=Math.min(drag.sx,drag.ex),x2=Math.max(drag.sx,drag.ex);
+  if(x2-x1<8)return;
+  // Clamp to plot area X
+  var pa=P.pa;
+  x1=Math.max(pa.x,x1); x2=Math.min(pa.x+pa.w,x2);
+  P.selX={x1:x1,x2:x2};
+  rdFull(false);
+  document.getElementById('btn-ampliar').disabled=false;
+  document.getElementById('hint-B').textContent='✓ Pico seleccionado. Tocá "Ampliar" o redibujá la ventana.';
+}
+
+// ── CROP CANVAS DRAW ───────────────────────────────────────────
+function rdCrop(dragging){
+  var ctx=P.ctx_crop;
+  ctx.drawImage(P.cropSrc,0,0);
+  if(P.bl&&!dragging)drawBLc();
+  if(dragging&&drawMode){
+    ctx.strokeStyle='rgba(55,138,221,0.9)';ctx.lineWidth=3;ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.moveTo(drag.sx,drag.sy);ctx.lineTo(drag.ex,drag.ey);ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+function commitBL(){
+  if(!drawMode)return;
+  var x1=Math.min(drag.sx,drag.ex),y1=drag.sx<drag.ex?drag.sy:drag.ey;
+  var x2=Math.max(drag.sx,drag.ex),y2=drag.sx<drag.ex?drag.ey:drag.sy;
+  if(x2-x1<8){toggleDraw();return;}
+
+  var curve=P.cropCurve, ch=P.cropSrc.height;
+  var i1=Math.max(0,Math.round(x1));
+  var i2=Math.min(curve.length-1,Math.round(x2));
+  var maxV=-Infinity,maxI=i1;
+  for(var i=i1;i<=i2;i++){
+    if(curve[i]!==null&&curve[i]>maxV){maxV=curve[i];maxI=i;}
+  }
+  var apX=maxI, apY=(1-maxV)*ch;
+  var frac=(x2-x1)>0?(apX-x1)/(x2-x1):0.5;
+  frac=Math.max(0,Math.min(1,frac));
+  var baseY=y1+frac*(y2-y1);
+  var baseNorm=1-baseY/ch;
+  if(baseY<apY)baseY=apY+10;
+
+  P.bl={x1:x1,y1:y1,x2:x2,y2:y2};
+  P.pk={maxV:maxV,maxI:maxI,baseNorm:baseNorm,baseY:baseY,apY:apY,i1:i1,i2:i2};
+
+  drawMode=false;
+  document.getElementById('cv-crop').className='free';
+  var btn=document.getElementById('btn-draw');
+  btn.classList.remove('on');
+  btn.textContent='✏ Redibujar línea de base';
+  document.getElementById('hint-C').textContent='✓ Linha de base trazada. Verificá o redibujá si es necesario.';
+  document.getElementById('btn-peak-ok').disabled=false;
+  rdCrop(false);
+  drawBLc();
+}
+
+function drawBLc(){
+  var ctx=P.ctx_crop,bl=P.bl,pk=P.pk,ch=P.cropSrc.height;
+  if(!bl||!pk)return;
+  ctx.strokeStyle='#378ADD';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(bl.x1,bl.y1);ctx.lineTo(bl.x2,bl.y2);ctx.stroke();
+  ctx.fillStyle='#378ADD';
+  ctx.beginPath();ctx.arc(bl.x1,bl.y1,5,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(bl.x2,bl.y2,5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#E24B4A';
+  ctx.beginPath();ctx.arc(pk.maxI,pk.apY,6,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#E24B4A';ctx.lineWidth=3;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(pk.maxI,pk.apY);ctx.lineTo(pk.maxI,pk.baseY);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#E24B4A';ctx.font='bold 15px sans-serif';
+  ctx.fillText('H',pk.maxI+8,(pk.apY+pk.baseY)/2+5);
+}
+
+// ── NOISE CANVAS DRAW ─────────────────────────────────────────
+function rdNoise(dragging){
+  var ctx=N.ctx,pa=N.pa;
+  ctx.drawImage(N.src,0,0);
+  drawBorder(ctx,pa);
+  if(dragging&&drag.on){
+    var x1=Math.min(drag.sx,drag.ex),x2=Math.max(drag.sx,drag.ex);
+    ctx.fillStyle='rgba(0,0,0,0.25)';
+    ctx.fillRect(pa.x,pa.y,x1-pa.x,pa.h);
+    ctx.fillRect(x2,pa.y,pa.x+pa.w-x2,pa.h);
+    ctx.fillStyle='rgba(186,117,23,0.15)';
+    ctx.fillRect(x1,pa.y,x2-x1,pa.h);
+    ctx.strokeStyle='#BA7517';ctx.lineWidth=2;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(x1,pa.y);ctx.lineTo(x1,pa.y+pa.h);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x2,pa.y);ctx.lineTo(x2,pa.y+pa.h);ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  if(N.sel&&!dragging){
+    var sx1=N.sel.x1,sx2=N.sel.x2;
+    ctx.fillStyle='rgba(0,0,0,0.25)';
+    ctx.fillRect(pa.x,pa.y,sx1-pa.x,pa.h);
+    ctx.fillRect(sx2,pa.y,pa.x+pa.w-sx2,pa.h);
+    ctx.fillStyle='rgba(186,117,23,0.12)';
+    ctx.fillRect(sx1,pa.y,sx2-sx1,pa.h);
+    var hw=12;
+    ctx.fillStyle='#BA7517';
+    ctx.fillRect(sx1-hw/2,pa.y,hw,pa.h);
+    ctx.fillRect(sx2-hw/2,pa.y,hw,pa.h);
+    if(N.ns){
+      var ty=pa.y+(1-N.ns.max)*pa.h,by=pa.y+(1-N.ns.min)*pa.h;
+      ctx.strokeStyle='#BA7517';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);
+      ctx.beginPath();ctx.moveTo(sx1,ty);ctx.lineTo(sx2,ty);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(sx1,by);ctx.lineTo(sx2,by);ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#BA7517'; ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('h', (sx1+sx2)/2, (ty+by)/2+5);
+      ctx.fillStyle='#BA7517';ctx.font='bold 14px sans-serif';
+      ctx.fillText('h',(sx1+sx2)/2,(ty+by)/2+5);
     }
   }
 }
 
-function commitNoise() {
-  var x1=Math.min(drag.sx,drag.ex), x2=Math.max(drag.sx,drag.ex);
-  if (x2-x1 < 5) return;
-  var pa = N.pa, curve = N.curve;
-  var i1 = Math.max(0, Math.round(x1-pa.x));
-  var i2 = Math.min(curve.length-1, Math.round(x2-pa.x));
-  var vals = [];
-  for (var i=i1; i<=i2; i++) if (curve[i] !== null) vals.push(curve[i]);
-  if (vals.length < 3) return;
-  vals.sort(function(a,b){ return a-b; });
-  var lo=Math.floor(vals.length*.10), hi=Math.ceil(vals.length*.90);
-  var tr = vals.slice(lo, hi);
-  N.sel = { x1:x1, x2:x2 };
-  N.ns  = { max: tr[tr.length-1], min: tr[0] };
-  redrawNoise(false);
-  document.getElementById('btn-noise-ok').disabled = false;
-  document.getElementById('hint-noise').textContent = '✓ Región de ruido seleccionada. Redibujá si es necesario.';
+function commitNoise(){
+  var x1=Math.min(drag.sx,drag.ex),x2=Math.max(drag.sx,drag.ex);
+  if(x2-x1<5)return;
+  var pa=N.pa,curve=N.curve;
+  var i1=Math.max(0,Math.round(x1-pa.x));
+  var i2=Math.min(curve.length-1,Math.round(x2-pa.x));
+  var vals=[];
+  for(var i=i1;i<=i2;i++)if(curve[i]!==null)vals.push(curve[i]);
+  if(vals.length<3)return;
+  vals.sort(function(a,b){return a-b;});
+  var lo=Math.floor(vals.length*.10),hi=Math.ceil(vals.length*.90);
+  var tr=vals.slice(lo,hi);
+  N.sel={x1:x1,x2:x2};
+  N.ns={max:tr[tr.length-1],min:tr[0]};
+  rdNoise(false);
+  document.getElementById('btn-noise-ok').disabled=false;
+  document.getElementById('hint-N').textContent='✓ Región de ruido seleccionada.';
 }
 
 // ── CONFIRM ────────────────────────────────────────────────────
-function confirmPeak() {
-  var ymax = parseFloat(document.getElementById('peak-ymax').value);
-  var ymin = parseFloat(document.getElementById('peak-ymin').value);
-  if (isNaN(ymax) || isNaN(ymin)) { alert('Ingresá los valores de escala Y.'); return; }
-  P.ymax = ymax; P.ymin = ymin;
-  document.getElementById('dot1').className = 'stepdot done';
-  document.getElementById('dot1').textContent = '✓';
-  document.getElementById('card2').classList.remove('hidden');
+function confirmPeak(){
+  var ymax=parseFloat(document.getElementById('peak-ymax').value);
+  var ymin=parseFloat(document.getElementById('peak-ymin').value);
+  if(isNaN(ymax)||isNaN(ymin)){alert('Ingresá los valores de escala Y.');return;}
+  P.ymax=ymax;P.ymin=ymin;
+  document.getElementById('dot1').className='sdot done';
+  document.getElementById('dot1').textContent='✓';
+  show('card2');
   document.getElementById('dot2').classList.add('active');
-  document.getElementById('card2').scrollIntoView({ behavior:'smooth' });
+  document.getElementById('card2').scrollIntoView({behavior:'smooth'});
 }
 
-function confirmNoise() {
-  var ymax = parseFloat(document.getElementById('noise-ymax').value);
-  var ymin = parseFloat(document.getElementById('noise-ymin').value);
-  if (isNaN(ymax) || isNaN(ymin)) { alert('Ingresá los valores de escala Y.'); return; }
-  N.ymax = ymax; N.ymin = ymin;
-  document.getElementById('dot2').className = 'stepdot done';
-  document.getElementById('dot2').textContent = '✓';
-  document.getElementById('card3').classList.remove('hidden');
+function confirmNoise(){
+  var ymax=parseFloat(document.getElementById('noise-ymax').value);
+  var ymin=parseFloat(document.getElementById('noise-ymin').value);
+  if(isNaN(ymax)||isNaN(ymin)){alert('Ingresá los valores de escala Y.');return;}
+  N.ymax=ymax;N.ymin=ymin;
+  document.getElementById('dot2').className='sdot done';
+  document.getElementById('dot2').textContent='✓';
+  show('card3');
   document.getElementById('dot3').classList.add('active');
-  document.getElementById('card3').scrollIntoView({ behavior:'smooth' });
+  document.getElementById('card3').scrollIntoView({behavior:'smooth'});
 }
 
 // ── CALCULATE ──────────────────────────────────────────────────
-function calculate() {
-  if (!P.pk || !N.ns) { alert('Completá los pasos anteriores.'); return; }
-  var pr = P.ymax - P.ymin, nr = N.ymax - N.ymin;
-  var H  = (P.pk.maxV - P.pk.baseNorm) * pr;
-  var h  = (N.ns.max  - N.ns.min)      * nr;
-  if (H <= 0) { alert('H es cero o negativo — redibujá la línea de base sobre la base del pico.'); return; }
-  if (h <= 0) { alert('h es cero — ajustá la región de ruido.'); return; }
-  var sn = method === 'pp' ? H / (h/2) : (2*H) / h;
-  var tf = calcTF();
-  showRes(sn, tf, H, h);
+function calculate(){
+  if(!P.pk||!N.ns){alert('Completá los pasos anteriores.');return;}
+  var pr=P.ymax-P.ymin,nr=N.ymax-N.ymin;
+  var H=(P.pk.maxV-P.pk.baseNorm)*pr;
+  var h=(N.ns.max-N.ns.min)*nr;
+  if(H<=0){alert('H es cero o negativo — redibujá la línea de base sobre la base del pico.');return;}
+  if(h<=0){alert('h es cero — ajustá la región de ruido.');return;}
+  var sn=method==='pp'?H/(h/2):(2*H)/h;
+  var tf=calcTF();
+  showRes(sn,tf,H,h);
 }
 
-function calcTF() {
-  var pk = P.pk, curve = P.cropCurve;
-  if (!pk || !curve) return null;
-  var seg = [];
-  for (var i = pk.i1; i <= pk.i2; i++) seg.push(curve[i] !== null ? curve[i] : 0);
-  if (seg.length < 5) return null;
-  var mi = pk.maxI - pk.i1, base = pk.baseNorm, H = seg[mi] - base;
-  var lv5 = base + H*.05, le = 0, re = seg.length-1;
-  for (var i=0; i<=mi; i++) if (seg[i] >= lv5) { le=i; break; }
-  for (var i=seg.length-1; i>=mi; i--) if (seg[i] >= lv5) { re=i; break; }
-  var a = mi-le, b = re-mi;
-  if (a <= 0) return null;
-  return (a+b) / (2*a);
+function calcTF(){
+  var pk=P.pk,curve=P.cropCurve;
+  if(!pk||!curve)return null;
+  var seg=[];
+  for(var i=pk.i1;i<=pk.i2;i++)seg.push(curve[i]!==null?curve[i]:0);
+  if(seg.length<5)return null;
+  var mi=pk.maxI-pk.i1,base=pk.baseNorm,H=seg[mi]-base;
+  var lv5=base+H*.05,le=0,re=seg.length-1;
+  for(var i=0;i<=mi;i++)if(seg[i]>=lv5){le=i;break;}
+  for(var i=seg.length-1;i>=mi;i--)if(seg[i]>=lv5){re=i;break;}
+  var a=mi-le,b=re-mi;
+  if(a<=0)return null;
+  return(a+b)/(2*a);
 }
 
 // ── RESULTS ────────────────────────────────────────────────────
-function showRes(sn, tf, H, h) {
-  var sc  = sn>=10?'ok':sn>=3?'warn':'bad';
-  var sl  = sn>=10?'Aceptable (≥10 USP)':sn>=3?'Límite (3–10)':'Insuficiente (<3)';
-  var tc  = tf===null?'warn':(tf>=0.8&&tf<=2.0)?'ok':tf<=2.5?'warn':'bad';
-  var tl  = tf===null?'No calculado':(tf>=0.8&&tf<=2.0)?'Aceptable (0.8–2.0)':tf<=2.5?'Límite (≤2.5)':'Fuera de rango (>2.5)';
-  var td  = tf!==null?tf.toFixed(2):'N/D';
-  var ml  = { usp:'USP <621>', ep:'EP 2.2.46', pp:'Peak-to-peak' };
-  var si  = sn>=10?'Pico cuantificable con buena exactitud.':sn>=3?'Detectable, cuantificación con mayor incertidumbre.':'En límite de detección. Considerar optimización del método.';
-  var ti  = tf===null?'':(tf<0.8?'Fronting pronunciado — posible efecto de solvente o sobrecarga.':tf<=1.3?'Pico simétrico — excelente eficiencia cromatográfica.':tf<=2.0?'Tailing leve — aceptable para la mayoría de los métodos.':tf<=2.5?'Tailing moderado — puede afectar la cuantificación.':'Tailing severo — revisar columna, temperatura o pH de fase móvil.');
-  var sec = document.getElementById('results');
+function showRes(sn,tf,H,h){
+  var sc=sn>=10?'ok':sn>=3?'warn':'bad';
+  var sl=sn>=10?'Aceptable (≥10 USP)':sn>=3?'Límite (3–10)':'Insuficiente (<3)';
+  var tc=tf===null?'warn':(tf>=0.8&&tf<=2.0)?'ok':tf<=2.5?'warn':'bad';
+  var tl=tf===null?'No calculado':(tf>=0.8&&tf<=2.0)?'Aceptable (0.8–2.0)':tf<=2.5?'Límite (≤2.5)':'Fuera de rango (>2.5)';
+  var td=tf!==null?tf.toFixed(2):'N/D';
+  var ml={usp:'USP <621>',ep:'EP 2.2.46',pp:'Peak-to-peak'};
+  var si=sn>=10?'Pico cuantificable con buena exactitud.':sn>=3?'Detectable, cuantificación con mayor incertidumbre.':'En límite de detección.';
+  var ti=tf===null?'':(tf<0.8?'Fronting pronunciado.':tf<=1.3?'Pico simétrico — excelente eficiencia.':tf<=2.0?'Tailing leve — aceptable.':tf<=2.5?'Tailing moderado.':'Tailing severo — revisar columna/temperatura/pH.');
+  var sec=document.getElementById('results');
   sec.classList.remove('hidden');
-  sec.innerHTML =
+  sec.innerHTML=
     '<div class="card">'+
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">'+
     '<div><div style="font-size:14px;font-weight:700;color:#1a1a2e">Resultado del análisis</div>'+
@@ -731,21 +689,21 @@ function showRes(sn, tf, H, h) {
     '<div class="metric"><div class="mlabel">S / N</div><div class="mval '+sc+'">'+sn.toFixed(1)+'</div><div class="mdet">H='+Math.round(H)+' · h='+Math.round(h)+'</div></div>'+
     '<div class="metric"><div class="mlabel">Tailing Factor</div><div class="mval '+tc+'">'+td+'</div><div class="mdet">USP &lt;621&gt; 5%</div></div>'+
     '</div>'+
-    '<div class="status '+sc+'"><div class="sdot"></div>S/N: '+sl+'</div>'+
-    '<div class="status '+tc+'"><div class="sdot"></div>TF: '+tl+'</div>'+
+    '<div class="sts '+sc+'"><div class="stsdot"></div>S/N: '+sl+'</div>'+
+    '<div class="sts '+tc+'"><div class="stsdot"></div>TF: '+tl+'</div>'+
     '<div class="obs"><strong>S/N:</strong> '+si+(ti?'<br><strong>TF:</strong> '+ti:'')+'</div>'+
     '<div class="disc">Resultado orientativo — verificar en software validado del equipo.<br>'+
     '<a href="https://www.agsanalitica.com.ar" target="_blank">AGS Analítica S.A.</a> · Soporte técnico en cromatografía · Buenos Aires</div>'+
     '</div>'+
     '<button class="btn btn-ghost" onclick="location.reload()" style="border:1.5px solid #ddd;margin-top:6px">Nuevo análisis</button>';
-  sec.scrollIntoView({ behavior:'smooth' });
-  document.getElementById('dot3').className = 'stepdot done';
-  document.getElementById('dot3').textContent = '✓';
+  sec.scrollIntoView({behavior:'smooth'});
+  document.getElementById('dot3').className='sdot done';
+  document.getElementById('dot3').textContent='✓';
 }
 
-// ── IMAGE ALGORITHMS ───────────────────────────────────────────
-function detectPA(canvas) {
-  var w=canvas.width, h=canvas.height;
+// ── ALGORITHMS ────────────────────────────────────────────────
+function detectPA(canvas){
+  var w=canvas.width,h=canvas.height;
   var ctx=canvas.getContext('2d',{willReadFrequently:true});
   var data=ctx.getImageData(0,0,w,h).data;
   function px(x,y){var i=(y*w+x)*4;return{r:data[i],g:data[i+1],b:data[i+2]};}
@@ -766,10 +724,10 @@ function detectPA(canvas) {
   return{x:left+2,y:Math.floor(h*.02),w:Math.floor(w*.97)-left-2,h:bottom-Math.floor(h*.02),bg:bg};
 }
 
-function extractCurve(canvas, pa) {
-  var ctx = canvas.getContext('2d',{willReadFrequently:true});
-  var data = ctx.getImageData(pa.x, pa.y, pa.w, pa.h).data;
-  var bg = pa.bg, curve = new Array(pa.w).fill(null);
+function extractCurve(canvas,pa){
+  var ctx=canvas.getContext('2d',{willReadFrequently:true});
+  var data=ctx.getImageData(pa.x,pa.y,pa.w,pa.h).data;
+  var bg=pa.bg,curve=new Array(pa.w).fill(null);
   for(var col=0;col<pa.w;col++){
     var best=null,bd=0;
     for(var row=0;row<pa.h;row++){
@@ -789,7 +747,7 @@ function extractCurve(canvas, pa) {
   return out;
 }
 
-function drawBorderOn(ctx, pa) {
+function drawBorder(ctx,pa){
   ctx.strokeStyle='rgba(55,138,221,0.4)';ctx.lineWidth=2;
   ctx.strokeRect(pa.x,pa.y,pa.w,pa.h);
 }
