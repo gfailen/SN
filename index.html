@@ -372,17 +372,6 @@ function setupCanvas(which) {
   // Canvas internal resolution = source image size
   el.width  = src.width;
   el.height = src.height;
-  S[which].zoom = 1;
-  // Display size = fit to container width
-  var outer = document.getElementById(which+'-outer');
-  var dw = outer.clientWidth || 360;
-  var dh = Math.round(src.height * dw / src.width);
-  el.style.width  = dw + 'px';
-  el.style.height = dh + 'px';
-  S[which]._baseW = dw;
-  S[which]._baseH = dh;
-  S[which]._baseZoom = 1;
-  document.getElementById(which+'-zoom-label').textContent = '100%';
   var ctx = el.getContext('2d', { willReadFrequently:true });
   ctx.drawImage(src, 0, 0);
   S[which].ctx = ctx;
