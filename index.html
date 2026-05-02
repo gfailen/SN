@@ -423,27 +423,27 @@ function stopDrawMode() {
 // ── EVENT BINDING ─────────────────────────────────────────────
 function bindEvents(which) {
   var el = document.getElementById(which+'-canvas');
-  // Remove old listeners by cloning
-  var newEl = el.cloneNode(true);
-  el.parentNode.replaceChild(newEl, el);
-  S[which].ctx = newEl.getContext('2d', { willReadFrequently:true });
-  S[which].ctx.drawImage(S[which].src, 0, 0);
-  drawPlotBorder(which);
+  // Don't clone - just attach listeners directly (cloning loses canvas content on iOS)
+  // Use a flag on the element to avoid duplicate listeners
+  if (el._listenersAttached) return;
+  el._listenersAttached = true;
 
   (function(w) {
-    newEl.addEventListener('mousedown',  function(e){ onDown(e, w); }, false);
-    newEl.addEventListener('mousemove',  function(e){ onMove(e, w); }, false);
-    newEl.addEventListener('mouseup',    function(e){ onUp(e, w); },   false);
-    newEl.addEventListener('touchstart', function(e){
-      if (e.touches.length===1) { e.preventDefault(); onDown(e.touches[0], w); }
-      // 2+ fingers = pinch zoom, don't intercept
+    el.addEventListener('mousedown',  function(e){ onDown(e, w); }, false);
+    el.addEventListener('mousemove',  function(e){ onMove(e, w); }, false);
+    el.addEventListener('mouseup',    function(e){ onUp(e, w); },   false);
+    el.addEventListener('touchstart', function(e){
+      if (e.touches.length===1 && (w!=='peak' || S.drawMode)) {
+        e.preventDefault(); onDown(e.touches[0], w);
+      }
     }, {passive:false});
-    newEl.addEventListener('touchmove',  function(e){
-      if (e.touches.length===1) { e.preventDefault(); onMove(e.touches[0], w); }
-      // 2+ fingers = pinch zoom, pass through
+    el.addEventListener('touchmove',  function(e){
+      if (e.touches.length===1 && S.drag.active && S.drag.which===w) {
+        e.preventDefault(); onMove(e.touches[0], w);
+      }
     }, {passive:false});
-    newEl.addEventListener('touchend',   function(e){
-      if (e.touches.length===0 && e.changedTouches.length===1) {
+    el.addEventListener('touchend', function(e){
+      if (S.drag.active && S.drag.which===w) {
         e.preventDefault(); onUp(e.changedTouches[0], w);
       }
     }, {passive:false});
