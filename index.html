@@ -241,23 +241,44 @@ function zoomCanvas(which, dir) {
   if (idx === -1) idx = 2;
   idx = Math.max(0, Math.min(ZOOM_STEPS.length-1, idx + dir));
   S[which].zoom = ZOOM_STEPS[idx];
-  applyZoom(which);
+  var el   = document.getElementById(which+'-canvas');
+  var src  = S[which].src;
+  var baseW = S[which]._baseW || (document.getElementById(which+'-outer').clientWidth || 360);
+  var newW  = Math.round(baseW * S[which].zoom);
+  var newH  = Math.round(src.height * newW / src.width);
+  el.style.width  = newW + 'px';
+  el.style.height = newH + 'px';
+  document.getElementById(which+'-zoom-label').textContent = Math.round(S[which].zoom*100) + '%';
+  bindEvents(which);
+  if (which === 'peak') {
+    S[which].ctx.drawImage(src, 0, 0);
+    drawPlotBorder('peak');
+    if (S.peak.baseline) drawBaselineCommitted();
+  } else {
+    S[which].ctx.drawImage(src, 0, 0);
+    drawPlotBorder('noise');
+    if (S.noise.sel) redrawNoise();
+  }
 }
 
 function applyZoom(which) {
-  var src  = S[which].src;
+  var src = S[which].src;
   if (!src) return;
-  var zoom = S[which].zoom || 1;
+  var zoom  = S[which].zoom || 1;
   var outer = document.getElementById(which+'-outer');
-  var baseW = outer.clientWidth || 360;
-  var el    = document.getElementById(which+'-canvas');
-  var newW  = Math.round(baseW * zoom);
+  var baseW = Math.round((outer.clientWidth || 360) / (S[which]._baseZoom || 1));
+  if (!S[which]._baseZoom) {
+    S[which]._baseZoom = 1;
+    baseW = outer.clientWidth || 360;
+  }
+  var el   = document.getElementById(which+'-canvas');
+  var newW = Math.round(baseW * zoom);
+  var newH = Math.round(src.height * newW / src.width);
+  // CSS size controls display, canvas internal size stays the same (src dimensions)
   el.style.width  = newW + 'px';
-  el.style.height = Math.round(src.height * newW / src.width) + 'px';
+  el.style.height = newH + 'px';
   document.getElementById(which+'-zoom-label').textContent = Math.round(zoom*100) + '%';
-  // Re-bind events since element size changed
   bindEvents(which);
-  // Redraw
   if (which === 'peak') {
     S[which].ctx.drawImage(src, 0, 0);
     drawPlotBorder('peak');
@@ -401,12 +422,18 @@ function renderChecks(div, result) {
 function setupCanvas(which) {
   var el  = document.getElementById(which+'-canvas');
   var src = S[which].src;
+  // Canvas internal resolution = source image size
   el.width  = src.width;
   el.height = src.height;
   S[which].zoom = 1;
-  var dw = document.getElementById(which+'-outer').clientWidth || 360;
-  el.style.width  = dw+'px';
-  el.style.height = Math.round(src.height*dw/src.width)+'px';
+  // Display size = fit to container width
+  var outer = document.getElementById(which+'-outer');
+  var dw = outer.clientWidth || 360;
+  var dh = Math.round(src.height * dw / src.width);
+  el.style.width  = dw + 'px';
+  el.style.height = dh + 'px';
+  S[which]._baseW = dw;
+  S[which]._baseZoom = 1;
   document.getElementById(which+'-zoom-label').textContent = '100%';
   var ctx = el.getContext('2d', { willReadFrequently:true });
   ctx.drawImage(src, 0, 0);
