@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0069)file:///C:/Users/user/Dropbox/PC/Downloads/ags-cromatograma-v7_4.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Analizador de Cromatogramas — AGS Analítica</title>
 <style>
@@ -65,7 +65,7 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom}
 <div class="wrap">
   <div style="text-align:center;padding:14px 0 4px">
     <div class="logo">
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4.5" stroke="#7FB3E0" stroke-width="1"/><polyline points="1.5,7 3.5,4 5.5,5.5 8.5,2" stroke="#7FB3E0" stroke-width="1.2" fill="none"/></svg>
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4.5" stroke="#7FB3E0" stroke-width="1"></circle><polyline points="1.5,7 3.5,4 5.5,5.5 8.5,2" stroke="#7FB3E0" stroke-width="1.2" fill="none"></polyline></svg>
       AGS ANALÍTICA
     </div>
     <div class="app-title">Analizador de cromatogramas</div>
@@ -100,7 +100,7 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom}
           <button class="btn btn-amber" onclick="redoB()" style="flex:1">↩ Redibujar</button>
           <button class="btn btn-ghost" onclick="resetPeak()" style="flex:1">📷 Cambiar foto</button>
         </div>
-        <button class="btn btn-primary" id="btn-ampliar" onclick="doCrop()" disabled>Ampliar pico seleccionado →</button>
+        <button class="btn btn-primary" id="btn-ampliar" onclick="doCrop()" disabled="">Ampliar pico seleccionado →</button>
       </div>
     </div>
 
@@ -119,7 +119,7 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom}
         <div class="field"><label>Escala Y máximo</label><input type="number" id="peak-ymax" placeholder="ej: 160000"></div>
         <div class="field"><label>Escala Y mínimo</label><input type="number" id="peak-ymin" placeholder="ej: 0"></div>
       </div>
-      <button class="btn btn-primary" id="btn-peak-ok" onclick="confirmPeak()" disabled>Confirmar pico →</button>
+      <button class="btn btn-primary" id="btn-peak-ok" onclick="confirmPeak()" disabled="">Confirmar pico →</button>
     </div>
   </div>
 
@@ -150,7 +150,7 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom}
           <div class="field"><label>Escala Y máximo</label><input type="number" id="noise-ymax" placeholder="ej: 8000"></div>
           <div class="field"><label>Escala Y mínimo</label><input type="number" id="noise-ymin" placeholder="ej: 0"></div>
         </div>
-        <button class="btn btn-primary" id="btn-noise-ok" onclick="confirmNoise()" disabled>Confirmar ruido →</button>
+        <button class="btn btn-primary" id="btn-noise-ok" onclick="confirmNoise()" disabled="">Confirmar ruido →</button>
       </div>
     </div>
   </div>
@@ -159,9 +159,9 @@ canvas.free{touch-action:pan-x pan-y pinch-zoom}
   <div class="card hidden" id="card3">
     <div class="card-title"><div class="sdot" id="dot3">3</div>Método S/N</div>
     <div class="mrow">
-      <div class="mbtn sel" id="m-usp" onclick="selM('usp')">USP &lt;621&gt;</div>
-      <div class="mbtn" id="m-ep"  onclick="selM('ep')">EP 2.2.46</div>
-      <div class="mbtn" id="m-pp"  onclick="selM('pp')">Peak-to-peak</div>
+      <div class="mbtn sel" id="m-usp" onclick="selM(&#39;usp&#39;)">USP &lt;621&gt;</div>
+      <div class="mbtn" id="m-ep" onclick="selM(&#39;ep&#39;)">EP 2.2.46</div>
+      <div class="mbtn" id="m-pp" onclick="selM(&#39;pp&#39;)">Peak-to-peak</div>
     </div>
     <div class="mdesc" id="mdesc">S/N = 2H/h. H = altura desde la línea de base. h = amplitud pico-a-pico del ruido.</div>
     <button class="btn btn-primary" style="margin-top:10px" onclick="calculate()">Calcular S/N y Tailing Factor</button>
@@ -325,7 +325,7 @@ function doCrop(){
 
   delete _bound['crop']; // reset so new canvas gets listeners
   hide('ph-B'); show('ph-C');
-  setupCropCanvas();
+  setTimeout(function(){ setupCropCanvas(); }, 0);
 }
 
 function setupCropCanvas(){
@@ -798,5 +798,6 @@ function drawBorder(ctx,pa){
   ctx.strokeRect(pa.x,pa.y,pa.w,pa.h);
 }
 </script>
-</body>
-</html>
+
+
+</body></html>
