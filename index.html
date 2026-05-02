@@ -82,7 +82,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .hidden { display: none !important; }
 .canvas-hint-zoom { font-size: 11px; color: #888; text-align:center; margin-bottom:4px; }
 .canvas-outer { width: 100%; border-radius: 10px; background: #222; margin-bottom: 8px; overflow: hidden; }
-.canvas-outer canvas { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: none; }
+.canvas-outer canvas { display: block; width: 100%; height: auto; cursor: default; touch-action: pan-x pan-y pinch-zoom; }
+.canvas-outer canvas.draw-mode { cursor: crosshair; touch-action: none; }
+.btn-draw { width: 100%; padding: 12px; border: 2px solid #378ADD; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; background: #fff; color: #378ADD; margin-top: 6px; transition: all 0.15s; }
+.btn-draw.active { background: #378ADD; color: #fff; }
 </style>
 </head>
 <body>
@@ -130,10 +133,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           Usá dos dedos para hacer zoom.<br>
           Luego <strong>arrastrá con un dedo</strong> sobre la baseline del pico (de izq a der o viceversa).
         </div>
-        <div class="canvas-hint-zoom">Hacé zoom nativo (pellizco) sobre la imagen para acercar</div>
+        <div class="canvas-hint" id="peak-hint">
+          Hacé zoom con pellizco para ver mejor la base del pico.<br>
+          Cuando estés listo, tocá <strong>Dibujar baseline</strong>.
+        </div>
         <div class="canvas-outer" id="peak-outer">
           <canvas id="peak-canvas"></canvas>
         </div>
+        <button class="btn-draw" id="btn-draw-baseline" onclick="startDrawMode()">
+          ✏️ Dibujar baseline
+        </button>
 
         <div class="scale-section">
           <div class="scale-title">Escala Y — valores del eje</div>
@@ -144,7 +153,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
 
         <button class="btn btn-primary" id="btn-peak-ok" onclick="confirmPeak()" disabled>Confirmar pico →</button>
-        <button class="btn btn-warn" id="btn-peak-redo" onclick="redoBaseline()" style="margin-top:4px">Redibujar baseline</button>
+
       </div>
       <button class="btn btn-ghost" onclick="retake('peak')" style="margin-top:6px">Repetir foto</button>
     </div>
@@ -218,6 +227,7 @@ var S = {
   peak:  { img:null, src:null, curve:null, plotArea:null, baseline:null, peak:null, ymax:null, ymin:null, zoom:1 },
   noise: { img:null, src:null, curve:null, plotArea:null, sel:null, noise:null, ymax:null, ymin:null, zoom:1 },
   drag:  { active:false, which:null, startX:0, startY:0, mode:null },
+  drawMode: false,
   method: 'usp'
 };
 
@@ -387,6 +397,29 @@ function drawPlotBorder(which) {
   ctx.strokeRect(pa.x,pa.y,pa.w,pa.h);
 }
 
+// ── DRAW MODE ─────────────────────────────────────────────────
+function startDrawMode() {
+  S.drawMode = true;
+  var el = document.getElementById('peak-canvas');
+  el.classList.add('draw-mode');
+  var btn = document.getElementById('btn-draw-baseline');
+  btn.classList.add('active');
+  btn.textContent = '✏️ Dibujando... arrastrá sobre la baseline';
+  document.getElementById('peak-hint').innerHTML = 
+    '<strong>Modo dibujo activo</strong> — arrastrá con un dedo sobre la baseline del pico.';
+}
+
+function stopDrawMode() {
+  S.drawMode = false;
+  var el = document.getElementById('peak-canvas');
+  el.classList.remove('draw-mode');
+  var btn = document.getElementById('btn-draw-baseline');
+  btn.classList.remove('active');
+  btn.textContent = '✏️ Redibujar baseline';
+  document.getElementById('peak-hint').textContent = 
+    '✓ Baseline dibujada. Hacé zoom para verificar o redibujá si es necesario.';
+}
+
 // ── EVENT BINDING ─────────────────────────────────────────────
 function bindEvents(which) {
   var el = document.getElementById(which+'-canvas');
@@ -435,7 +468,7 @@ function getPos(e, which) {
 function onDown(e, which) {
   var pos = getPos(e, which);
   if (which === 'peak') {
-    // Baseline draw mode
+    if (!S.drawMode) return; // only draw when in draw mode
     S.drag = { active:true, which:'peak', mode:'baseline', startX:pos.x, startY:pos.y, endX:pos.x, endY:pos.y };
   } else {
     // Noise selection mode - check if near existing handle
@@ -472,10 +505,12 @@ function onUp(e, which) {
   if (!S.drag.active) return;
   S.drag.active = false;
   if (which==='peak') {
+    if (!S.drag.active) return;
     var pos = getPos(e, which);
     S.drag.endX = pos.x;
     S.drag.endY = pos.y;
     commitBaseline();
+    stopDrawMode();
   } else {
     var sel = S.noise.sel;
     if (sel && sel.x2-sel.x1 > 5) analyzeNoise();
@@ -487,9 +522,8 @@ function redoBaseline() {
   S.peak.baseline = null;
   S.peak.peak     = null;
   document.getElementById('btn-peak-ok').disabled = true;
-  document.getElementById('peak-hint').innerHTML =
-    'Usá dos dedos para hacer zoom.<br>Luego <strong>arrastrá con un dedo</strong> sobre la baseline del pico.';
   redrawPeak();
+  startDrawMode();
 }
 
 function redrawPeak() {
