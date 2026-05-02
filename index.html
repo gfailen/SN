@@ -35,7 +35,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* Canvas area - allows pinch zoom */
 .canvas-outer { width: 100%; overflow: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; background: #222; margin-bottom: 8px; touch-action: pan-x pan-y pinch-zoom; }
-.canvas-outer canvas { display: block; max-width: 100%; height: auto; cursor: crosshair; touch-action: none; }
+.canvas-outer canvas { display: block; max-width: 100%; height: auto; cursor: crosshair; touch-action: pinch-zoom; }
 .canvas-hint { font-size: 11px; color: #555; text-align: center; margin-bottom: 5px; line-height: 1.5; min-height: 32px; }
 
 .scale-section { margin-bottom: 10px; }
@@ -384,12 +384,16 @@ function bindEvents(which) {
     newEl.addEventListener('mouseup',    function(e){ onUp(e, w); },   false);
     newEl.addEventListener('touchstart', function(e){
       if (e.touches.length===1) { e.preventDefault(); onDown(e.touches[0], w); }
+      // 2+ fingers = pinch zoom, don't intercept
     }, {passive:false});
     newEl.addEventListener('touchmove',  function(e){
       if (e.touches.length===1) { e.preventDefault(); onMove(e.touches[0], w); }
+      // 2+ fingers = pinch zoom, pass through
     }, {passive:false});
     newEl.addEventListener('touchend',   function(e){
-      if (e.changedTouches.length===1) { e.preventDefault(); onUp(e.changedTouches[0], w); }
+      if (e.touches.length===0 && e.changedTouches.length===1) {
+        e.preventDefault(); onUp(e.changedTouches[0], w);
+      }
     }, {passive:false});
   })(which);
 }
