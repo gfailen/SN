@@ -126,7 +126,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div id="peak-editor" class="hidden">
       <div id="peak-checks" class="guide-list"></div>
       <div id="peak-canvas-area" class="hidden">
-        <div class="canvas-hint" id="peak-hint">Arrastrá sobre el cromatograma para seleccionar la ventana del pico</div>
+        <div class="canvas-hint" id="peak-hint">Arrastrá para seleccionar el pico. Después podés ajustar los bordes con los handles verdes.</div>
         <div class="canvas-wrap" id="peak-wrap"><canvas id="peak-canvas"></canvas></div>
         <div class="scale-section">
           <div class="scale-title">Escala Y — ingresá los valores del eje</div>
@@ -176,7 +176,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div id="noise-editor" class="hidden">
       <div id="noise-checks" class="guide-list"></div>
       <div id="noise-canvas-area" class="hidden">
-        <div class="canvas-hint">Arrastrá para seleccionar la región de ruido</div>
+        <div class="canvas-hint">Arrastrá para seleccionar la región de ruido. Ajustá los bordes con los handles.</div>
         <div class="canvas-wrap" id="noise-wrap"><canvas id="noise-canvas"></canvas></div>
         <div class="scale-section">
           <div class="scale-title">Escala Y — ingresá los valores del eje</div>
@@ -449,31 +449,53 @@ function setupCanvas(which) {
   ctx.lineWidth = 2;
   ctx.strokeRect(pa.x, pa.y, pa.w, pa.h);
 
-  // Events
-  canvasEl.onmousedown  = function(e){ dragStart(e, which); };
-  canvasEl.onmousemove  = function(e){ dragMove(e, which); };
-  canvasEl.onmouseup    = function(e){ dragEnd(e, which); };
-  canvasEl.ontouchstart = function(e){ e.preventDefault(); dragStart(e.touches[0], which); };
-  canvasEl.ontouchmove  = function(e){ e.preventDefault(); dragMove(e.touches[0], which); };
-  canvasEl.ontouchend   = function(e){ e.preventDefault(); dragEnd(e.changedTouches[0], which); };
+  // Events - use which captured in closure
+  (function(w) {
+    canvasEl.onmousedown  = function(e){ dragStart(e, w); };
+    canvasEl.onmousemove  = function(e){ if(S.drag.active) dragMove(e, w); };
+    canvasEl.onmouseup    = function(e){ dragEnd(e, w); };
+    canvasEl.ontouchstart = function(e){ e.preventDefault(); dragStart(e.touches[0], w); };
+    canvasEl.ontouchmove  = function(e){ e.preventDefault(); dragMove(e.touches[0], w); };
+    canvasEl.ontouchend   = function(e){ e.preventDefault(); dragEnd(e.changedTouches[0], w); };
+  })(which);
 }
 
 function canvasPos(e, which) {
   var el = document.getElementById(which+'-canvas');
   var rect = el.getBoundingClientRect();
-  return (e.clientX - rect.left) * (el.width / rect.width);
+  var scaleX = el.width / rect.width;
+  var clientX = e.clientX !== undefined ? e.clientX : (e.touches ? e.touches[0].clientX : 0);
+  return (clientX - rect.left) * scaleX;
 }
 
+// Handle dragging: 'new' = creating selection, 'left' = moving left handle, 'right' = moving right handle
 function dragStart(e, which) {
-  S.drag = { active:true, which:which, startX: canvasPos(e, which) };
-  S[which].sel = { x1: S.drag.startX, x2: S.drag.startX };
+  var cx = canvasPos(e, which);
+  var sel = S[which].sel;
+  var handleZone = 20;
+  var mode = 'new';
+  if (sel) {
+    if (Math.abs(cx - sel.x1) < handleZone) mode = 'left';
+    else if (Math.abs(cx - sel.x2) < handleZone) mode = 'right';
+  }
+  S.drag = { active:true, which:which, startX:cx, mode:mode };
+  if (mode === 'new') S[which].sel = { x1:cx, x2:cx };
 }
 
 function dragMove(e, which) {
   if (!S.drag.active || S.drag.which !== which) return;
   var cx = canvasPos(e, which);
-  S[which].sel = { x1: Math.min(S.drag.startX, cx), x2: Math.max(S.drag.startX, cx) };
+  var sel = S[which].sel;
+  if (S.drag.mode === 'left') {
+    S[which].sel = { x1: Math.min(cx, sel.x2 - 10), x2: sel.x2 };
+  } else if (S.drag.mode === 'right') {
+    S[which].sel = { x1: sel.x1, x2: Math.max(cx, sel.x1 + 10) };
+  } else {
+    S[which].sel = { x1: Math.min(S.drag.startX, cx), x2: Math.max(S.drag.startX, cx) };
+  }
   redraw(which);
+  // Draw handles
+  drawHandles(which);
 }
 
 function dragEnd(e, which) {
@@ -481,8 +503,29 @@ function dragEnd(e, which) {
   S.drag.active = false;
   var sel = S[which].sel;
   if (!sel || sel.x2 - sel.x1 < 5) return;
-  if (which === 'peak') analyzePeak();
-  else analyzeNoise();
+  if (which === 'peak') { analyzePeak(); drawHandles('peak'); }
+  else { analyzeNoise(); drawHandles('noise'); }
+}
+
+function drawHandles(which) {
+  var ctx = S[which].ctx;
+  var pa  = S[which].plotArea;
+  var sel = S[which].sel;
+  if (!sel) return;
+  var handleW = 10;
+  var color = which === 'peak' ? '#1D9E75' : '#BA7517';
+  // Left handle
+  ctx.fillStyle = color;
+  ctx.fillRect(sel.x1 - handleW/2, pa.y, handleW, pa.h);
+  // Right handle
+  ctx.fillRect(sel.x2 - handleW/2, pa.y, handleW, pa.h);
+  // Handle grip lines
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.5;
+  [pa.y + pa.h*0.35, pa.y + pa.h*0.5, pa.y + pa.h*0.65].forEach(function(y) {
+    ctx.beginPath(); ctx.moveTo(sel.x1-3, y); ctx.lineTo(sel.x1+3, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sel.x2-3, y); ctx.lineTo(sel.x2+3, y); ctx.stroke();
+  });
 }
 
 // ── REDRAW ────────────────────────────────────────────────────
@@ -563,6 +606,7 @@ function analyzePeak() {
 
 function drawPeakMarkers() {
   redraw('peak');
+  drawHandles('peak');
   var ctx = S.peak.ctx;
   var pa  = S.peak.plotArea;
   var pk  = S.peak.peak;
@@ -631,6 +675,7 @@ function analyzeNoise() {
 
 function drawNoiseMarkers() {
   redraw('noise');
+  drawHandles('noise');
   var ctx = S.noise.ctx;
   var pa  = S.noise.plotArea;
   var n   = S.noise.noise;
