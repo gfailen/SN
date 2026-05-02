@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes">
 <title>Analizador de Cromatogramas — AGS Analítica</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -16,26 +16,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .card { background: #fff; border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
 .card-title { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-.dot { width: 22px; height: 22px; border-radius: 50%; background: #ccc; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-.dot.active { background: #378ADD; }
-.dot.done { background: #1D9E75; }
+.stepdot { width: 22px; height: 22px; border-radius: 50%; background: #ccc; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.stepdot.active { background: #378ADD; }
+.stepdot.done { background: #1D9E75; }
 
 .guide-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
 .guide-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #555; padding: 7px 10px; background: #f8f9fa; border-radius: 8px; line-height: 1.4; }
-.guide-item.ok  { background: #E1F5EE; color: #0F6E56; }
-.guide-item.warn{ background: #FAEEDA; color: #854F0B; }
-.guide-item.bad { background: #FCEBEB; color: #A32D2D; }
+.guide-item.ok   { background: #E1F5EE; color: #0F6E56; }
+.guide-item.warn { background: #FAEEDA; color: #854F0B; }
+.guide-item.bad  { background: #FCEBEB; color: #A32D2D; }
 .gi { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
 
-.upload-btn { width: 100%; padding: 18px 14px; border: 2px dashed #c8d0e0; border-radius: 10px; background: #f8faff; cursor: pointer; text-align: center; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.upload-btn:hover { border-color: #0B2545; background: #f0f4ff; }
+.upload-zone { position: relative; width: 100%; padding: 18px 14px; border: 2px dashed #c8d0e0; border-radius: 10px; background: #f8faff; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.upload-zone input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 16px; }
 .upload-icon { font-size: 30px; }
 .upload-title { font-size: 14px; font-weight: 600; color: #1a1a2e; }
 .upload-hint { font-size: 11px; color: #888; }
 
-.canvas-hint { font-size: 11px; color: #555; text-align: center; margin-bottom: 5px; line-height: 1.4; }
-.canvas-wrap { position: relative; width: 100%; border-radius: 10px; overflow: hidden; background: #222; margin-bottom: 10px; touch-action: none; user-select: none; }
-.canvas-wrap canvas { display: block; width: 100%; height: auto; }
+/* Canvas area - allows pinch zoom */
+.canvas-outer { width: 100%; overflow: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; background: #222; margin-bottom: 8px; touch-action: pan-x pan-y pinch-zoom; }
+.canvas-outer canvas { display: block; max-width: 100%; height: auto; cursor: crosshair; touch-action: none; }
+.canvas-hint { font-size: 11px; color: #555; text-align: center; margin-bottom: 5px; line-height: 1.5; min-height: 32px; }
 
 .scale-section { margin-bottom: 10px; }
 .scale-title { font-size: 12px; font-weight: 600; color: #444; margin-bottom: 7px; }
@@ -47,9 +48,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; margin-top: 6px; }
 .btn-primary { background: #0B2545; color: #fff; }
-.btn-primary:hover { opacity: 0.87; }
 .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
 .btn-ghost { background: #fff; color: #666; border: 1.5px solid #ddd; }
+.btn-warn  { background: #FAEEDA; color: #854F0B; border: none; }
 
 .method-row { display: flex; gap: 6px; margin-bottom: 6px; }
 .mbtn { flex: 1; padding: 8px 4px; font-size: 11px; font-weight: 600; border: 1.5px solid #ddd; border-radius: 8px; background: #fff; color: #777; cursor: pointer; text-align: center; }
@@ -78,10 +79,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .divider { height: 1px; background: #f0f0f0; margin: 10px 0; }
 .disclaimer { font-size: 10px; color: #bbb; text-align: center; line-height: 1.6; }
 .disclaimer a { color: #0B2545; text-decoration: none; }
-
 .hidden { display: none !important; }
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #ddd; border-top-color: #0B2545; border-radius: 50%; animation: spin 0.65s linear infinite; vertical-align: middle; margin-right: 6px; }
-@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -102,48 +100,47 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <!-- PASO 1: PICO -->
   <div class="card" id="card-peak">
     <div class="card-title">
-      <div class="dot active" id="dot1">1</div>
+      <div class="stepdot active" id="dot1">1</div>
       Foto del pico
     </div>
 
     <div id="peak-upload">
       <div class="guide-list">
+        <div class="guide-item"><span class="gi">✓</span>Integrá el pico primero en el software — la línea de baseline debe ser visible</div>
         <div class="guide-item"><span class="gi">🔍</span>El pico debe verse completo — inicio y fin sobre la baseline</div>
         <div class="guide-item"><span class="gi">📏</span>La escala Y debe ser legible</div>
-        <div class="guide-item"><span class="gi">📐</span>Encuadrá el gráfico derecho, sin ángulo ni reflejo</div>
+        <div class="guide-item"><span class="gi">📐</span>Foto derecha, sin ángulo ni reflejo</div>
       </div>
-      <div style="position:relative">
-        <div class="upload-btn">
-          <div class="upload-icon">📷</div>
-          <div class="upload-title">Foto del pico</div>
-          <div class="upload-hint">PNG o JPG · cámara o galería</div>
-        </div>
-        <input type="file" id="file-peak" accept="image/*"
-          style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px">
+      <div class="upload-zone">
+        <input type="file" id="file-peak" accept="image/*">
+        <div class="upload-icon">📷</div>
+        <div class="upload-title">Foto del pico</div>
+        <div class="upload-hint">PNG o JPG · cámara o galería</div>
       </div>
     </div>
 
     <div id="peak-editor" class="hidden">
       <div id="peak-checks" class="guide-list"></div>
+
       <div id="peak-canvas-area" class="hidden">
-        <div class="canvas-hint" id="peak-hint">Arrastrá para seleccionar el pico. Después podés ajustar los bordes con los handles verdes.</div>
-        <div class="canvas-wrap" id="peak-wrap"><canvas id="peak-canvas"></canvas></div>
+        <div class="canvas-hint" id="peak-hint">
+          Usá dos dedos para hacer zoom.<br>
+          Luego <strong>arrastrá con un dedo</strong> sobre la baseline del pico (de izq a der o viceversa).
+        </div>
+        <div class="canvas-outer" id="peak-outer">
+          <canvas id="peak-canvas"></canvas>
+        </div>
+
         <div class="scale-section">
-          <div class="scale-title">Escala Y — ingresá los valores del eje</div>
+          <div class="scale-title">Escala Y — valores del eje</div>
           <div class="scale-row">
-            <div class="field">
-              <label>Valor máximo</label>
-              <input type="number" id="peak-ymax" placeholder="ej: 160000">
-            </div>
-            <div class="field">
-              <label>Valor mínimo</label>
-              <input type="number" id="peak-ymin" placeholder="ej: 0">
-            </div>
+            <div class="field"><label>Valor máximo</label><input type="number" id="peak-ymax" placeholder="ej: 160000"></div>
+            <div class="field"><label>Valor mínimo</label><input type="number" id="peak-ymin" placeholder="ej: 0"></div>
           </div>
         </div>
-        <button class="btn btn-primary" id="btn-peak-ok" onclick="confirmPeak()" disabled>
-          Confirmar pico →
-        </button>
+
+        <button class="btn btn-primary" id="btn-peak-ok" onclick="confirmPeak()" disabled>Confirmar pico →</button>
+        <button class="btn btn-warn" id="btn-peak-redo" onclick="redoBaseline()" style="margin-top:4px">Redibujar baseline</button>
       </div>
       <button class="btn btn-ghost" onclick="retake('peak')" style="margin-top:6px">Repetir foto</button>
     </div>
@@ -152,7 +149,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <!-- PASO 2: RUIDO -->
   <div class="card hidden" id="card-noise">
     <div class="card-title">
-      <div class="dot" id="dot2">2</div>
+      <div class="stepdot" id="dot2">2</div>
       Foto del ruido
     </div>
 
@@ -162,38 +159,31 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="guide-item"><span class="gi">〰️</span>La fluctuación debe ser visible</div>
         <div class="guide-item"><span class="gi">📏</span>La escala Y debe ser legible</div>
       </div>
-      <div style="position:relative">
-        <div class="upload-btn">
-          <div class="upload-icon">📷</div>
-          <div class="upload-title">Foto del ruido</div>
-          <div class="upload-hint">PNG o JPG · región de línea base sin pico</div>
-        </div>
-        <input type="file" id="file-noise" accept="image/*"
-          style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px">
+      <div class="upload-zone">
+        <input type="file" id="file-noise" accept="image/*">
+        <div class="upload-icon">📷</div>
+        <div class="upload-title">Foto del ruido</div>
+        <div class="upload-hint">PNG o JPG · región de línea base sin pico</div>
       </div>
     </div>
 
     <div id="noise-editor" class="hidden">
       <div id="noise-checks" class="guide-list"></div>
       <div id="noise-canvas-area" class="hidden">
-        <div class="canvas-hint">Arrastrá para seleccionar la región de ruido. Ajustá los bordes con los handles.</div>
-        <div class="canvas-wrap" id="noise-wrap"><canvas id="noise-canvas"></canvas></div>
+        <div class="canvas-hint" id="noise-hint">
+          Arrastrá para seleccionar la región de ruido.<br>Ajustá los bordes con los handles.
+        </div>
+        <div class="canvas-outer" id="noise-outer">
+          <canvas id="noise-canvas"></canvas>
+        </div>
         <div class="scale-section">
-          <div class="scale-title">Escala Y — ingresá los valores del eje</div>
+          <div class="scale-title">Escala Y — valores del eje</div>
           <div class="scale-row">
-            <div class="field">
-              <label>Valor máximo</label>
-              <input type="number" id="noise-ymax" placeholder="ej: 8000">
-            </div>
-            <div class="field">
-              <label>Valor mínimo</label>
-              <input type="number" id="noise-ymin" placeholder="ej: 0">
-            </div>
+            <div class="field"><label>Valor máximo</label><input type="number" id="noise-ymax" placeholder="ej: 8000"></div>
+            <div class="field"><label>Valor mínimo</label><input type="number" id="noise-ymin" placeholder="ej: 0"></div>
           </div>
         </div>
-        <button class="btn btn-primary" id="btn-noise-ok" onclick="confirmNoise()" disabled>
-          Confirmar ruido →
-        </button>
+        <button class="btn btn-primary" id="btn-noise-ok" onclick="confirmNoise()" disabled>Confirmar ruido →</button>
       </div>
       <button class="btn btn-ghost" onclick="retake('noise')" style="margin-top:6px">Repetir foto</button>
     </div>
@@ -202,7 +192,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <!-- PASO 3: MÉTODO -->
   <div class="card hidden" id="card-method">
     <div class="card-title">
-      <div class="dot" id="dot3">3</div>
+      <div class="stepdot" id="dot3">3</div>
       Método S/N
     </div>
     <div class="method-row">
@@ -211,46 +201,37 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="mbtn" id="m-pp"  onclick="selMethod('pp')">Peak-to-peak</div>
     </div>
     <div class="method-desc" id="mdesc">
-      <strong>USP &lt;621&gt;:</strong> S/N = 2H/h. H = altura del pico desde la baseline interpolada. h = amplitud pico-a-pico del ruido.
+      <strong>USP &lt;621&gt;:</strong> S/N = 2H/h. H = altura del pico desde la baseline. h = amplitud pico-a-pico del ruido.
     </div>
     <button class="btn btn-primary" style="margin-top:10px" onclick="calculate()">Calcular S/N y Tailing Factor</button>
   </div>
 
-  <!-- RESULTADOS -->
   <div id="results" class="hidden"></div>
 
 </div>
-
 <script>
-// ── STATE ──────────────────────────────────────────────────────
 var S = {
-  peak:  { img:null, src:null, curve:null, plotArea:null, sel:null, peak:null, ymax:null, ymin:null },
+  peak:  { img:null, src:null, curve:null, plotArea:null, baseline:null, peak:null, ymax:null, ymin:null },
   noise: { img:null, src:null, curve:null, plotArea:null, sel:null, noise:null, ymax:null, ymin:null },
-  drag:  { active:false, which:null, startX:0 },
+  drag:  { active:false, which:null, startX:0, startY:0, mode:null },
   method: 'usp'
 };
 
 var MDESC = {
-  usp: '<strong>USP &lt;621&gt;:</strong> S/N = 2H/h. H = altura desde la baseline interpolada. h = amplitud pico-a-pico del ruido.',
-  ep:  '<strong>EP 2.2.46:</strong> S/N = 2H/h. Igual que USP, ruido en región adyacente ≥ 20× ancho del pico.',
+  usp: '<strong>USP &lt;621&gt;:</strong> S/N = 2H/h. H = altura desde la baseline. h = amplitud pico-a-pico del ruido.',
+  ep:  '<strong>EP 2.2.46:</strong> S/N = 2H/h. Ruido en región adyacente ≥ 20× ancho del pico.',
   pp:  '<strong>Peak-to-peak:</strong> S/N = H / (h/2). Ruido como amplitud total pico-a-pico.'
 };
 
-// ── FILE INPUT WIRING ──────────────────────────────────────────
+// ── FILE INPUTS ───────────────────────────────────────────────
 document.getElementById('file-peak').onchange = function(){
-  if (this.files && this.files[0]) loadImage('peak', this.files[0]);
-};
-document.getElementById('file-peak').oninput = function(){
   if (this.files && this.files[0]) loadImage('peak', this.files[0]);
 };
 document.getElementById('file-noise').onchange = function(){
   if (this.files && this.files[0]) loadImage('noise', this.files[0]);
 };
-document.getElementById('file-noise').oninput = function(){
-  if (this.files && this.files[0]) loadImage('noise', this.files[0]);
-};
 
-// ── IMAGE LOADING ──────────────────────────────────────────────
+// ── IMAGE LOADING ─────────────────────────────────────────────
 function loadImage(which, file) {
   var url = URL.createObjectURL(file);
   var img = new Image();
@@ -264,7 +245,7 @@ function loadImage(which, file) {
 }
 
 function retake(which) {
-  S[which] = { img:null, src:null, curve:null, plotArea:null, sel:null, peak:null, noise:null, ymax:null, ymin:null };
+  S[which] = { img:null, src:null, curve:null, plotArea:null, baseline:null, sel:null, peak:null, noise:null, ymax:null, ymin:null };
   document.getElementById('file-'+which).value = '';
   document.getElementById(which+'-upload').classList.remove('hidden');
   document.getElementById(which+'-editor').classList.add('hidden');
@@ -272,578 +253,510 @@ function retake(which) {
   document.getElementById(which+'-checks').innerHTML = '';
 }
 
-// ── IMAGE PROCESSING ───────────────────────────────────────────
+// ── PROCESS IMAGE ─────────────────────────────────────────────
 function processImage(which) {
   var img = S[which].img;
   var checksDiv = document.getElementById(which+'-checks');
-  checksDiv.innerHTML = '<div class="guide-item"><span class="spinner"></span>Analizando imagen...</div>';
+  checksDiv.innerHTML = '<div class="guide-item"><span class="gi">⏳</span>Analizando imagen...</div>';
 
-  // Draw to offscreen canvas
   var oc = document.createElement('canvas');
-  var maxW = 1200;
+  var maxW = 1400;
   var sc = Math.min(1, maxW / img.width);
-  oc.width  = img.width  * sc;
-  oc.height = img.height * sc;
-  var octx = oc.getContext('2d');
+  oc.width  = Math.round(img.width  * sc);
+  oc.height = Math.round(img.height * sc);
+  var octx = oc.getContext('2d', { willReadFrequently: true });
   octx.drawImage(img, 0, 0, oc.width, oc.height);
   S[which].src = oc;
 
-  var plotArea = detectPlotArea(oc, octx);
-  S[which].plotArea = plotArea;
+  var pa = detectPlotArea(oc, octx);
+  S[which].plotArea = pa;
 
-  var curve = extractCurve(oc, octx, plotArea);
+  var curve = extractCurve(oc, octx, pa);
   S[which].curve = curve;
 
-  var checks = validateImage(oc, octx, plotArea, curve, which);
+  var checks = validateImage(pa, curve, oc, which);
   renderChecks(checksDiv, checks);
-
   if (!checks.ok) return;
 
   document.getElementById(which+'-canvas-area').classList.remove('hidden');
   setupCanvas(which);
 }
 
-// ── PLOT AREA DETECTION ────────────────────────────────────────
+// ── PLOT AREA DETECTION ───────────────────────────────────────
 function detectPlotArea(canvas, ctx) {
   var w = canvas.width, h = canvas.height;
   var data = ctx.getImageData(0, 0, w, h).data;
-
-  function px(x, y) {
-    var i = (y*w+x)*4;
-    return { r:data[i], g:data[i+1], b:data[i+2] };
-  }
-  function diff(a, b) {
-    return Math.abs(a.r-b.r)+Math.abs(a.g-b.g)+Math.abs(a.b-b.b);
-  }
-
-  var bg = px(Math.floor(w*0.6), Math.floor(h*0.1)); // sample background from upper-right area
-
-  // Scan left boundary
+  function px(x,y){ var i=(y*w+x)*4; return {r:data[i],g:data[i+1],b:data[i+2]}; }
+  function diff(a,b){ return Math.abs(a.r-b.r)+Math.abs(a.g-b.g)+Math.abs(a.b-b.b); }
+  var bg = px(Math.floor(w*0.7), Math.floor(h*0.1));
   var left = Math.floor(w*0.04);
-  for (var x = Math.floor(w*0.02); x < Math.floor(w*0.25); x++) {
-    var nonBg = 0;
-    for (var y = Math.floor(h*0.1); y < Math.floor(h*0.8); y++) {
-      if (diff(px(x,y), bg) > 35) nonBg++;
-    }
-    if (nonBg < 4) left = x;
-    else break;
+  for (var x=Math.floor(w*0.02); x<Math.floor(w*0.3); x++) {
+    var n=0; for (var y=Math.floor(h*0.1); y<Math.floor(h*0.8); y++) { if(diff(px(x,y),bg)>35) n++; }
+    if (n<4) left=x; else break;
   }
-
-  // Scan bottom boundary
   var bottom = Math.floor(h*0.88);
-  for (var y2 = Math.floor(h*0.95); y2 > Math.floor(h*0.6); y2--) {
-    var nonBg2 = 0;
-    for (var x2 = Math.floor(w*0.1); x2 < Math.floor(w*0.9); x2++) {
-      if (diff(px(x2,y2), bg) > 35) nonBg2++;
-    }
-    if (nonBg2 < 6) bottom = y2;
-    else break;
+  for (var y2=Math.floor(h*0.95); y2>Math.floor(h*0.6); y2--) {
+    var n2=0; for (var x2=Math.floor(w*0.1); x2<Math.floor(w*0.9); x2++) { if(diff(px(x2,y2),bg)>35) n2++; }
+    if (n2<6) bottom=y2; else break;
   }
-
-  return { x: left+2, y: Math.floor(h*0.02), w: Math.floor(w*0.97)-left-2, h: bottom-Math.floor(h*0.02), bg: bg };
+  return { x:left+2, y:Math.floor(h*0.02), w:Math.floor(w*0.97)-left-2, h:bottom-Math.floor(h*0.02), bg:bg };
 }
 
-// ── CURVE EXTRACTION ───────────────────────────────────────────
+// ── CURVE EXTRACTION ──────────────────────────────────────────
 function extractCurve(canvas, ctx, pa) {
   var data = ctx.getImageData(pa.x, pa.y, pa.w, pa.h).data;
-  var curve = new Array(pa.w).fill(null);
   var bg = pa.bg;
-
-  for (var col = 0; col < pa.w; col++) {
-    var bestRow = null, bestDiff = 0;
-    for (var row = 0; row < pa.h; row++) {
-      var i = (row*pa.w+col)*4;
-      var d = Math.abs(data[i]-bg.r)+Math.abs(data[i+1]-bg.g)+Math.abs(data[i+2]-bg.b);
-      if (d > bestDiff && d > 20) { bestDiff = d; bestRow = row; }
+  var curve = new Array(pa.w).fill(null);
+  for (var col=0; col<pa.w; col++) {
+    var bestRow=null, bestDiff=0;
+    for (var row=0; row<pa.h; row++) {
+      var i=(row*pa.w+col)*4;
+      var d=Math.abs(data[i]-bg.r)+Math.abs(data[i+1]-bg.g)+Math.abs(data[i+2]-bg.b);
+      if (d>bestDiff && d>20) { bestDiff=d; bestRow=row; }
     }
-    if (bestRow !== null) curve[col] = 1 - bestRow/pa.h;
+    if (bestRow!==null) curve[col]=1-bestRow/pa.h;
   }
-
-  // Smooth
-  var out = curve.slice();
-  var R = 3;
-  for (var i = R; i < curve.length-R; i++) {
-    if (curve[i] === null) continue;
-    var sum = 0, cnt = 0;
-    for (var j = -R; j <= R; j++) {
-      if (curve[i+j] !== null) { sum += curve[i+j]; cnt++; }
-    }
-    out[i] = sum/cnt;
+  var out=curve.slice(), R=3;
+  for (var i=R; i<curve.length-R; i++) {
+    if (curve[i]===null) continue;
+    var sum=0,cnt=0;
+    for (var j=-R; j<=R; j++) { if(curve[i+j]!==null){sum+=curve[i+j];cnt++;} }
+    out[i]=sum/cnt;
   }
   return out;
 }
 
-// ── VALIDATION ─────────────────────────────────────────────────
-function validateImage(canvas, ctx, pa, curve, which) {
-  var checks = [];
-  var ok = true;
-
-  // Plot area size
-  var ratio = (pa.w * pa.h) / (canvas.width * canvas.height);
-  if (ratio < 0.2) {
-    checks.push({ cls:'bad', text:'El gráfico ocupa muy poco espacio — acercate más a la pantalla' });
-    ok = false;
-  } else {
-    checks.push({ cls:'ok', text:'Área del gráfico detectada' });
-  }
-
-  // Trace visible
-  var valid = curve.filter(function(v){ return v !== null; });
-  if (valid.length < pa.w * 0.3) {
-    checks.push({ cls:'bad', text:'No se detecta trazo del cromatograma — verificá la foto' });
-    ok = false;
-  } else {
-    checks.push({ cls:'ok', text:'Trazo del cromatograma detectado' });
-  }
-
-  // Y axis region
-  var leftData = ctx.getImageData(0, 0, pa.x, canvas.height).data;
-  var dark = 0;
-  for (var i = 0; i < leftData.length; i+=4) {
-    if ((leftData[i]+leftData[i+1]+leftData[i+2])/3 < 180) dark++;
-  }
-  if (dark/(leftData.length/4) < 0.005) {
-    checks.push({ cls:'warn', text:'Escala Y poco visible — ingresá los valores manualmente' });
-  } else {
-    checks.push({ cls:'ok', text:'Región de escala Y detectada' });
-  }
-
-  // Noise image: check fluctuation
-  if (which === 'noise' && valid.length > 10) {
-    var mean = valid.reduce(function(a,b){return a+b;},0)/valid.length;
-    var variance = valid.reduce(function(a,b){return a+Math.pow(b-mean,2);},0)/valid.length;
-    if (Math.sqrt(variance) < 0.004) {
-      checks.push({ cls:'warn', text:'Fluctuación muy pequeña — hacé más zoom en la línea base' });
-    }
-  }
-
-  return { checks:checks, ok:ok };
+// ── VALIDATION ────────────────────────────────────────────────
+function validateImage(pa, curve, canvas, which) {
+  var checks=[], ok=true;
+  var ratio=(pa.w*pa.h)/(canvas.width*canvas.height);
+  if (ratio<0.2) { checks.push({cls:'bad',text:'El gráfico ocupa muy poco — acercate más'}); ok=false; }
+  else checks.push({cls:'ok',text:'Área del gráfico detectada'});
+  var valid=curve.filter(function(v){return v!==null;});
+  if (valid.length<pa.w*0.3) { checks.push({cls:'bad',text:'No se detecta trazo — verificá la foto'}); ok=false; }
+  else checks.push({cls:'ok',text:'Trazo del cromatograma detectado'});
+  return {checks:checks, ok:ok};
 }
 
 function renderChecks(div, result) {
   div.innerHTML = result.checks.map(function(c){
-    var icon = c.cls==='ok' ? '✓' : c.cls==='warn' ? '⚠' : '✗';
+    var icon=c.cls==='ok'?'✓':c.cls==='warn'?'⚠':'✗';
     return '<div class="guide-item '+c.cls+'"><span class="gi">'+icon+'</span>'+c.text+'</div>';
   }).join('');
 }
 
-// ── CANVAS SETUP ───────────────────────────────────────────────
+// ── CANVAS SETUP ──────────────────────────────────────────────
 function setupCanvas(which) {
-  var canvasEl = document.getElementById(which+'-canvas');
-  var wrap = document.getElementById(which+'-wrap');
+  var el  = document.getElementById(which+'-canvas');
   var src = S[which].src;
-
-  var dw = wrap.clientWidth || 360;
-  canvasEl.width  = src.width;
-  canvasEl.height = src.height;
-  canvasEl.style.width  = dw + 'px';
-  canvasEl.style.height = Math.round(src.height * dw/src.width) + 'px';
-
-  var ctx = canvasEl.getContext('2d');
+  el.width  = src.width;
+  el.height = src.height;
+  var dw = document.getElementById(which+'-outer').clientWidth || 360;
+  el.style.width  = dw+'px';
+  el.style.height = Math.round(src.height*dw/src.width)+'px';
+  var ctx = el.getContext('2d', { willReadFrequently:true });
   ctx.drawImage(src, 0, 0);
   S[which].ctx = ctx;
+  drawPlotBorder(which);
+  bindEvents(which);
+}
 
-  // Highlight plot area border
-  var pa = S[which].plotArea;
-  ctx.strokeStyle = 'rgba(55,138,221,0.5)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(pa.x, pa.y, pa.w, pa.h);
+function drawPlotBorder(which) {
+  var ctx=S[which].ctx, pa=S[which].plotArea;
+  ctx.strokeStyle='rgba(55,138,221,0.4)';
+  ctx.lineWidth=2;
+  ctx.strokeRect(pa.x,pa.y,pa.w,pa.h);
+}
 
-  // Events - use which captured in closure
+// ── EVENT BINDING ─────────────────────────────────────────────
+function bindEvents(which) {
+  var el = document.getElementById(which+'-canvas');
+  // Remove old listeners by cloning
+  var newEl = el.cloneNode(true);
+  el.parentNode.replaceChild(newEl, el);
+  S[which].ctx = newEl.getContext('2d', { willReadFrequently:true });
+  S[which].ctx.drawImage(S[which].src, 0, 0);
+  drawPlotBorder(which);
+
   (function(w) {
-    canvasEl.onmousedown  = function(e){ dragStart(e, w); };
-    canvasEl.onmousemove  = function(e){ if(S.drag.active) dragMove(e, w); };
-    canvasEl.onmouseup    = function(e){ dragEnd(e, w); };
-    canvasEl.ontouchstart = function(e){ e.preventDefault(); dragStart(e.touches[0], w); };
-    canvasEl.ontouchmove  = function(e){ e.preventDefault(); dragMove(e.touches[0], w); };
-    canvasEl.ontouchend   = function(e){ e.preventDefault(); dragEnd(e.changedTouches[0], w); };
+    newEl.addEventListener('mousedown',  function(e){ onDown(e, w); }, false);
+    newEl.addEventListener('mousemove',  function(e){ onMove(e, w); }, false);
+    newEl.addEventListener('mouseup',    function(e){ onUp(e, w); },   false);
+    newEl.addEventListener('touchstart', function(e){
+      if (e.touches.length===1) { e.preventDefault(); onDown(e.touches[0], w); }
+    }, {passive:false});
+    newEl.addEventListener('touchmove',  function(e){
+      if (e.touches.length===1) { e.preventDefault(); onMove(e.touches[0], w); }
+    }, {passive:false});
+    newEl.addEventListener('touchend',   function(e){
+      if (e.changedTouches.length===1) { e.preventDefault(); onUp(e.changedTouches[0], w); }
+    }, {passive:false});
   })(which);
 }
 
-function canvasPos(e, which) {
-  var el = document.getElementById(which+'-canvas');
+function getPos(e, which) {
+  var el   = document.getElementById(which+'-canvas');
   var rect = el.getBoundingClientRect();
-  var scaleX = el.width / rect.width;
-  var clientX = e.clientX !== undefined ? e.clientX : (e.touches ? e.touches[0].clientX : 0);
-  return (clientX - rect.left) * scaleX;
+  var scaleX = el.width  / rect.width;
+  var scaleY = el.height / rect.height;
+  return {
+    x: (e.clientX - rect.left) * scaleX,
+    y: (e.clientY - rect.top)  * scaleY
+  };
 }
 
-// Handle dragging: 'new' = creating selection, 'left' = moving left handle, 'right' = moving right handle
-function dragStart(e, which) {
-  var cx = canvasPos(e, which);
-  var sel = S[which].sel;
-  var handleZone = 20;
-  var mode = 'new';
-  if (sel) {
-    if (Math.abs(cx - sel.x1) < handleZone) mode = 'left';
-    else if (Math.abs(cx - sel.x2) < handleZone) mode = 'right';
-  }
-  S.drag = { active:true, which:which, startX:cx, mode:mode };
-  if (mode === 'new') S[which].sel = { x1:cx, x2:cx };
-}
-
-function dragMove(e, which) {
-  if (!S.drag.active || S.drag.which !== which) return;
-  var cx = canvasPos(e, which);
-  var sel = S[which].sel;
-  if (S.drag.mode === 'left') {
-    S[which].sel = { x1: Math.min(cx, sel.x2 - 10), x2: sel.x2 };
-  } else if (S.drag.mode === 'right') {
-    S[which].sel = { x1: sel.x1, x2: Math.max(cx, sel.x1 + 10) };
+function onDown(e, which) {
+  var pos = getPos(e, which);
+  if (which === 'peak') {
+    // Baseline draw mode
+    S.drag = { active:true, which:'peak', mode:'baseline', startX:pos.x, startY:pos.y, endX:pos.x, endY:pos.y };
   } else {
-    S[which].sel = { x1: Math.min(S.drag.startX, cx), x2: Math.max(S.drag.startX, cx) };
+    // Noise selection mode - check if near existing handle
+    var sel = S.noise.sel;
+    var pa  = S.noise.plotArea;
+    var mode = 'new';
+    if (sel) {
+      if (Math.abs(pos.x - sel.x1) < 22) mode = 'left';
+      else if (Math.abs(pos.x - sel.x2) < 22) mode = 'right';
+    }
+    S.drag = { active:true, which:'noise', mode:mode, startX:pos.x, startY:pos.y };
+    if (mode==='new') S.noise.sel = { x1:pos.x, x2:pos.x };
   }
-  redraw(which);
-  // Draw handles
-  drawHandles(which);
 }
 
-function dragEnd(e, which) {
+function onMove(e, which) {
+  if (!S.drag.active || S.drag.which!==which) return;
+  var pos = getPos(e, which);
+  if (which==='peak') {
+    S.drag.endX = pos.x;
+    S.drag.endY = pos.y;
+    redrawPeak();
+    drawBaselineDrag();
+  } else {
+    var sel = S.noise.sel;
+    if (S.drag.mode==='left')       S.noise.sel = { x1:Math.min(pos.x, sel.x2-10), x2:sel.x2 };
+    else if (S.drag.mode==='right') S.noise.sel = { x1:sel.x1, x2:Math.max(pos.x, sel.x1+10) };
+    else                            S.noise.sel = { x1:Math.min(S.drag.startX,pos.x), x2:Math.max(S.drag.startX,pos.x) };
+    redrawNoise();
+  }
+}
+
+function onUp(e, which) {
   if (!S.drag.active) return;
   S.drag.active = false;
-  var sel = S[which].sel;
-  if (!sel || sel.x2 - sel.x1 < 5) return;
-  if (which === 'peak') { analyzePeak(); drawHandles('peak'); }
-  else { analyzeNoise(); drawHandles('noise'); }
+  if (which==='peak') {
+    var pos = getPos(e, which);
+    S.drag.endX = pos.x;
+    S.drag.endY = pos.y;
+    commitBaseline();
+  } else {
+    var sel = S.noise.sel;
+    if (sel && sel.x2-sel.x1 > 5) analyzeNoise();
+  }
 }
 
-function drawHandles(which) {
-  var ctx = S[which].ctx;
-  var pa  = S[which].plotArea;
-  var sel = S[which].sel;
-  if (!sel) return;
-  var handleW = 10;
-  var color = which === 'peak' ? '#1D9E75' : '#BA7517';
-  // Left handle
-  ctx.fillStyle = color;
-  ctx.fillRect(sel.x1 - handleW/2, pa.y, handleW, pa.h);
-  // Right handle
-  ctx.fillRect(sel.x2 - handleW/2, pa.y, handleW, pa.h);
-  // Handle grip lines
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 1.5;
-  [pa.y + pa.h*0.35, pa.y + pa.h*0.5, pa.y + pa.h*0.65].forEach(function(y) {
-    ctx.beginPath(); ctx.moveTo(sel.x1-3, y); ctx.lineTo(sel.x1+3, y); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(sel.x2-3, y); ctx.lineTo(sel.x2+3, y); ctx.stroke();
-  });
+// ── PEAK: BASELINE DRAW ───────────────────────────────────────
+function redoBaseline() {
+  S.peak.baseline = null;
+  S.peak.peak     = null;
+  document.getElementById('btn-peak-ok').disabled = true;
+  document.getElementById('peak-hint').innerHTML =
+    'Usá dos dedos para hacer zoom.<br>Luego <strong>arrastrá con un dedo</strong> sobre la baseline del pico.';
+  redrawPeak();
 }
 
-// ── REDRAW ────────────────────────────────────────────────────
-function redraw(which) {
-  var ctx = S[which].ctx;
-  var src = S[which].src;
-  var pa  = S[which].plotArea;
-  var sel = S[which].sel;
-  ctx.drawImage(src, 0, 0);
+function redrawPeak() {
+  var ctx = S.peak.ctx;
+  ctx.drawImage(S.peak.src, 0, 0);
+  drawPlotBorder('peak');
+  if (S.peak.baseline) drawBaselineCommitted();
+}
 
-  // Plot border
-  ctx.strokeStyle = 'rgba(55,138,221,0.5)';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(pa.x, pa.y, pa.w, pa.h);
-
-  if (!sel) return;
-  var x1 = sel.x1, x2 = sel.x2;
-
-  // Dim outside
-  ctx.fillStyle = 'rgba(0,0,0,0.3)';
-  ctx.fillRect(pa.x, pa.y, x1-pa.x, pa.h);
-  ctx.fillRect(x2, pa.y, pa.x+pa.w-x2, pa.h);
-
-  // Selection tint
-  ctx.fillStyle = which==='peak' ? 'rgba(29,158,117,0.12)' : 'rgba(186,117,23,0.12)';
-  ctx.fillRect(x1, pa.y, x2-x1, pa.h);
-
-  // Boundary lines
-  ctx.strokeStyle = which==='peak' ? '#1D9E75' : '#BA7517';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([4,3]);
-  ctx.beginPath(); ctx.moveTo(x1, pa.y); ctx.lineTo(x1, pa.y+pa.h); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x2, pa.y); ctx.lineTo(x2, pa.y+pa.h); ctx.stroke();
+function drawBaselineDrag() {
+  var ctx = S.peak.ctx;
+  var d   = S.drag;
+  ctx.strokeStyle = '#E24B4A';
+  ctx.lineWidth   = 2.5;
+  ctx.setLineDash([6,3]);
+  ctx.beginPath();
+  ctx.moveTo(d.startX, d.startY);
+  ctx.lineTo(d.endX,   d.endY);
+  ctx.stroke();
   ctx.setLineDash([]);
 }
 
-// ── PEAK ANALYSIS ─────────────────────────────────────────────
-function analyzePeak() {
-  var pa    = S.peak.plotArea;
+function commitBaseline() {
+  var d  = S.drag;
+  var pa = S.peak.plotArea;
+  // Normalize: left to right
+  var x1 = Math.min(d.startX, d.endX);
+  var y1 = d.startX < d.endX ? d.startY : d.endY;
+  var x2 = Math.max(d.startX, d.endX);
+  var y2 = d.startX < d.endX ? d.endY   : d.startY;
+
+  if (x2 - x1 < 10) return; // too short
+
+  // Find peak maximum between x1 and x2 in curve
   var curve = S.peak.curve;
-  var sel   = S.peak.sel;
-  if (!curve || !sel) return;
-
-  var i1 = Math.max(0, Math.round(sel.x1 - pa.x));
-  var i2 = Math.min(curve.length-1, Math.round(sel.x2 - pa.x));
-
-  // 1. Find maximum in window
+  var i1 = Math.max(0, Math.round(x1 - pa.x));
+  var i2 = Math.min(curve.length-1, Math.round(x2 - pa.x));
   var maxVal = -Infinity, maxIdx = i1;
-  for (var i = i1; i <= i2; i++) {
-    if (curve[i] !== null && curve[i] > maxVal) { maxVal = curve[i]; maxIdx = i; }
+  for (var i=i1; i<=i2; i++) {
+    if (curve[i]!==null && curve[i]>maxVal) { maxVal=curve[i]; maxIdx=i; }
   }
 
-  // 2. Find valley to the LEFT of the maximum
-  var leftValley = curve[i1] || 0;
-  var leftValleyIdx = i1;
-  for (var i = maxIdx; i >= i1; i--) {
-    if (curve[i] !== null && curve[i] < leftValley) { leftValley = curve[i]; leftValleyIdx = i; }
-  }
+  // Baseline at apex: interpolate along the drawn line
+  var frac  = (x2-x1)>0 ? ((pa.x+maxIdx)-x1)/(x2-x1) : 0.5;
+  // y in canvas coords → convert to normalized (0=bottom, 1=top)
+  var baseCanvasY = y1 + frac*(y2-y1);
+  var baseNorm    = 1 - (baseCanvasY - pa.y) / pa.h;
 
-  // 3. Find valley to the RIGHT of the maximum
-  var rightValley = curve[i2] || 0;
-  var rightValleyIdx = i2;
-  for (var i = maxIdx; i <= i2; i++) {
-    if (curve[i] !== null && curve[i] < rightValley) { rightValley = curve[i]; rightValleyIdx = i; }
-  }
+  S.peak.baseline = { x1:x1, y1:y1, x2:x2, y2:y2 };
+  S.peak.peak     = { maxVal:maxVal, maxIdx:maxIdx, baseAtApex:baseNorm, baseCanvasY:baseCanvasY, i1:i1, i2:i2 };
 
-  // 4. Interpolate baseline at apex
-  var span = rightValleyIdx - leftValleyIdx;
-  var frac  = span > 0 ? (maxIdx - leftValleyIdx) / span : 0.5;
-  var baseAtApex = leftValley + frac * (rightValley - leftValley);
-
-  S.peak.peak = { maxVal:maxVal, maxIdx:maxIdx, baseAtApex:baseAtApex, leftValley:leftValley, rightValley:rightValley, leftValleyIdx:leftValleyIdx, rightValleyIdx:rightValleyIdx, i1:i1, i2:i2 };
-
-  drawPeakMarkers();
+  redrawPeak();
+  drawBaselineCommitted();
   document.getElementById('btn-peak-ok').disabled = false;
-  document.getElementById('peak-hint').textContent = '✓ Pico detectado — línea azul = baseline, rojo = H. Ajustá la ventana si es necesario.';
+  document.getElementById('peak-hint').textContent = '✓ Baseline y pico detectados. Confirmá o redibujá la baseline si es necesario.';
 }
 
-function drawPeakMarkers() {
-  redraw('peak');
-  drawHandles('peak');
+function drawBaselineCommitted() {
   var ctx = S.peak.ctx;
-  var pa  = S.peak.plotArea;
   var pk  = S.peak.peak;
-  if (!pk) return;
-
-  var lvX = pa.x + pk.leftValleyIdx;
-  var lvY = pa.y + (1-pk.leftValley) * pa.h;
-  var rvX = pa.x + pk.rightValleyIdx;
-  var rvY = pa.y + (1-pk.rightValley) * pa.h;
-  var apX = pa.x + pk.maxIdx;
-  var apY = pa.y + (1-pk.maxVal) * pa.h;
-  var baY = pa.y + (1-pk.baseAtApex) * pa.h;
+  var bl  = S.peak.baseline;
+  var pa  = S.peak.plotArea;
+  if (!bl || !pk) return;
 
   // Baseline line
   ctx.strokeStyle = '#378ADD';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([5,3]);
-  ctx.beginPath(); ctx.moveTo(lvX, lvY); ctx.lineTo(rvX, rvY); ctx.stroke();
-  ctx.setLineDash([]);
+  ctx.lineWidth   = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(bl.x1, bl.y1);
+  ctx.lineTo(bl.x2, bl.y2);
+  ctx.stroke();
 
-  // Valley anchor dots
+  // Endpoint dots
   ctx.fillStyle = '#378ADD';
-  ctx.beginPath(); ctx.arc(lvX, lvY, 4, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(rvX, rvY, 4, 0, Math.PI*2); ctx.fill();
-
-  // H line (apex to baseline)
-  ctx.strokeStyle = '#E24B4A';
-  ctx.lineWidth = 2.5;
-  ctx.setLineDash([3,2]);
-  ctx.beginPath(); ctx.moveTo(apX, apY); ctx.lineTo(apX, baY); ctx.stroke();
-  ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(bl.x1, bl.y1, 5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(bl.x2, bl.y2, 5, 0, Math.PI*2); ctx.fill();
 
   // Apex dot
+  var apX = pa.x + pk.maxIdx;
+  var apY = pa.y + (1-pk.maxVal) * pa.h;
   ctx.fillStyle = '#E24B4A';
-  ctx.beginPath(); ctx.arc(apX, apY, 5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(apX, apY, 6, 0, Math.PI*2); ctx.fill();
+
+  // H line
+  ctx.strokeStyle = '#E24B4A';
+  ctx.lineWidth   = 2.5;
+  ctx.setLineDash([4,3]);
+  ctx.beginPath();
+  ctx.moveTo(apX, apY);
+  ctx.lineTo(apX, pk.baseCanvasY);
+  ctx.stroke();
+  ctx.setLineDash([]);
 
   // H label
-  ctx.fillStyle = '#E24B4A';
-  ctx.font = 'bold 14px sans-serif';
-  ctx.fillText('H', apX+7, (apY+baY)/2+5);
+  ctx.fillStyle   = '#E24B4A';
+  ctx.font        = 'bold 14px sans-serif';
+  ctx.fillText('H', apX+7, (apY+pk.baseCanvasY)/2+5);
 }
 
-// ── NOISE ANALYSIS ────────────────────────────────────────────
+// ── NOISE ─────────────────────────────────────────────────────
+function redrawNoise() {
+  var ctx = S.noise.ctx;
+  var pa  = S.noise.plotArea;
+  var sel = S.noise.sel;
+  ctx.drawImage(S.noise.src, 0, 0);
+  drawPlotBorder('noise');
+  if (!sel) return;
+
+  var x1=sel.x1, x2=sel.x2;
+  ctx.fillStyle='rgba(0,0,0,0.3)';
+  ctx.fillRect(pa.x, pa.y, x1-pa.x, pa.h);
+  ctx.fillRect(x2, pa.y, pa.x+pa.w-x2, pa.h);
+  ctx.fillStyle='rgba(186,117,23,0.15)';
+  ctx.fillRect(x1, pa.y, x2-x1, pa.h);
+
+  // Handles
+  var hW=12;
+  ctx.fillStyle='#BA7517';
+  ctx.fillRect(x1-hW/2, pa.y, hW, pa.h);
+  ctx.fillRect(x2-hW/2, pa.y, hW, pa.h);
+  ctx.strokeStyle='#fff'; ctx.lineWidth=1.5;
+  [0.35,0.5,0.65].forEach(function(f){
+    var y=pa.y+pa.h*f;
+    ctx.beginPath(); ctx.moveTo(x1-4,y); ctx.lineTo(x1+4,y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2-4,y); ctx.lineTo(x2+4,y); ctx.stroke();
+  });
+
+  if (S.noise.noise) drawNoiseBands();
+}
+
 function analyzeNoise() {
   var pa    = S.noise.plotArea;
   var curve = S.noise.curve;
   var sel   = S.noise.sel;
-  if (!curve || !sel) return;
+  var i1 = Math.max(0, Math.round(sel.x1-pa.x));
+  var i2 = Math.min(curve.length-1, Math.round(sel.x2-pa.x));
 
-  var i1 = Math.max(0, Math.round(sel.x1 - pa.x));
-  var i2 = Math.min(curve.length-1, Math.round(sel.x2 - pa.x));
-
+  // Use percentile 10-90 to exclude stray peaks
   var vals = [];
-  for (var i = i1; i <= i2; i++) {
-    if (curve[i] !== null) vals.push(curve[i]);
-  }
-  if (vals.length < 3) return;
+  for (var i=i1; i<=i2; i++) { if(curve[i]!==null) vals.push(curve[i]); }
+  if (vals.length<3) return;
+  vals.sort(function(a,b){return a-b;});
+  var lo = Math.floor(vals.length*0.10);
+  var hi = Math.ceil(vals.length*0.90);
+  var trimmed = vals.slice(lo, hi);
+  var noiseMin = trimmed[0];
+  var noiseMax = trimmed[trimmed.length-1];
 
-  var noiseMax = Math.max.apply(null, vals);
-  var noiseMin = Math.min.apply(null, vals);
   S.noise.noise = { max:noiseMax, min:noiseMin, i1:i1, i2:i2 };
-
-  drawNoiseMarkers();
+  redrawNoise();
   document.getElementById('btn-noise-ok').disabled = false;
+  document.getElementById('noise-hint').textContent = '✓ Región de ruido seleccionada. Ajustá los handles si es necesario.';
 }
 
-function drawNoiseMarkers() {
-  redraw('noise');
-  drawHandles('noise');
+function drawNoiseBands() {
   var ctx = S.noise.ctx;
   var pa  = S.noise.plotArea;
   var n   = S.noise.noise;
   var sel = S.noise.sel;
-  if (!n || !sel) return;
-
-  var topY = pa.y + (1-n.max) * pa.h;
-  var botY = pa.y + (1-n.min) * pa.h;
-
-  ctx.strokeStyle = '#BA7517';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([6,3]);
-  ctx.beginPath(); ctx.moveTo(sel.x1, topY); ctx.lineTo(sel.x2, topY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(sel.x1, botY); ctx.lineTo(sel.x2, botY); ctx.stroke();
+  if (!n||!sel) return;
+  var topY = pa.y+(1-n.max)*pa.h;
+  var botY = pa.y+(1-n.min)*pa.h;
+  ctx.strokeStyle='#BA7517'; ctx.lineWidth=1.5; ctx.setLineDash([6,3]);
+  ctx.beginPath(); ctx.moveTo(sel.x1,topY); ctx.lineTo(sel.x2,topY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sel.x1,botY); ctx.lineTo(sel.x2,botY); ctx.stroke();
   ctx.setLineDash([]);
-
-  // h label
-  ctx.fillStyle = '#BA7517';
-  ctx.font = 'bold 14px sans-serif';
+  ctx.fillStyle='#BA7517'; ctx.font='bold 13px sans-serif';
   ctx.fillText('h', (sel.x1+sel.x2)/2, (topY+botY)/2+5);
 }
 
 // ── CONFIRM STEPS ─────────────────────────────────────────────
 function confirmPeak() {
-  var ymax = parseFloat(document.getElementById('peak-ymax').value);
-  var ymin = parseFloat(document.getElementById('peak-ymin').value);
-  if (isNaN(ymax) || isNaN(ymin)) { alert('Ingresá los valores de escala Y del pico.'); return; }
-  S.peak.ymax = ymax;
-  S.peak.ymin = ymin;
-
-  document.getElementById('dot1').className = 'dot done';
-  document.getElementById('dot1').textContent = '✓';
+  var ymax=parseFloat(document.getElementById('peak-ymax').value);
+  var ymin=parseFloat(document.getElementById('peak-ymin').value);
+  if (isNaN(ymax)||isNaN(ymin)) { alert('Ingresá los valores de escala Y.'); return; }
+  S.peak.ymax=ymax; S.peak.ymin=ymin;
+  document.getElementById('dot1').className='stepdot done';
+  document.getElementById('dot1').textContent='✓';
   document.getElementById('card-noise').classList.remove('hidden');
   document.getElementById('dot2').classList.add('active');
-  document.getElementById('card-noise').scrollIntoView({ behavior:'smooth' });
+  document.getElementById('card-noise').scrollIntoView({behavior:'smooth'});
 }
 
 function confirmNoise() {
-  var ymax = parseFloat(document.getElementById('noise-ymax').value);
-  var ymin = parseFloat(document.getElementById('noise-ymin').value);
-  if (isNaN(ymax) || isNaN(ymin)) { alert('Ingresá los valores de escala Y del ruido.'); return; }
-  S.noise.ymax = ymax;
-  S.noise.ymin = ymin;
-
-  document.getElementById('dot2').className = 'dot done';
-  document.getElementById('dot2').textContent = '✓';
+  var ymax=parseFloat(document.getElementById('noise-ymax').value);
+  var ymin=parseFloat(document.getElementById('noise-ymin').value);
+  if (isNaN(ymax)||isNaN(ymin)) { alert('Ingresá los valores de escala Y.'); return; }
+  S.noise.ymax=ymax; S.noise.ymin=ymin;
+  document.getElementById('dot2').className='stepdot done';
+  document.getElementById('dot2').textContent='✓';
   document.getElementById('card-method').classList.remove('hidden');
   document.getElementById('dot3').classList.add('active');
-  document.getElementById('card-method').scrollIntoView({ behavior:'smooth' });
+  document.getElementById('card-method').scrollIntoView({behavior:'smooth'});
 }
 
 // ── METHOD ────────────────────────────────────────────────────
 function selMethod(m) {
-  S.method = m;
-  ['usp','ep','pp'].forEach(function(x){
-    document.getElementById('m-'+x).classList.toggle('sel', x===m);
-  });
-  document.getElementById('mdesc').innerHTML = MDESC[m];
+  S.method=m;
+  ['usp','ep','pp'].forEach(function(x){ document.getElementById('m-'+x).classList.toggle('sel',x===m); });
+  document.getElementById('mdesc').innerHTML=MDESC[m];
 }
 
 // ── CALCULATE ────────────────────────────────────────────────
 function calculate() {
-  var pk = S.peak.peak;
-  var ns = S.noise.noise;
-  if (!pk || !ns) { alert('Seleccioná las ventanas del pico y del ruido primero.'); return; }
+  var pk=S.peak.peak, ns=S.noise.noise;
+  if (!pk||!ns) { alert('Completá los pasos anteriores.'); return; }
 
   var peakRange  = S.peak.ymax  - S.peak.ymin;
   var noiseRange = S.noise.ymax - S.noise.ymin;
 
+  // H: from maxVal to baseAtApex, in normalized units → convert to real
   var H = (pk.maxVal - pk.baseAtApex) * peakRange;
-  var h = (ns.max - ns.min) * noiseRange;
+  var h = (ns.max    - ns.min)        * noiseRange;
+
+  if (H<=0) { alert('La altura del pico es cero o negativa. Redibujá la baseline sobre la base del pico.'); return; }
+  if (h<=0) { alert('El ruido calculado es cero. Ajustá la región de ruido.'); return; }
 
   var sn;
-  if (S.method === 'pp') {
-    sn = h > 0 ? H / (h/2) : 0;
-  } else {
-    sn = h > 0 ? (2*H) / h : 0;
-  }
+  if (S.method==='pp') sn = H/(h/2);
+  else sn = (2*H)/h;
 
-  var tf = estimateTF(S.peak.curve, pk);
-
+  var tf = estimateTF();
   renderResults(sn, tf, H, h);
 }
 
-// ── TAILING FACTOR ───────────────────────────────────────────
-function estimateTF(curve, pk) {
-  if (!curve || !pk) return null;
-  var i1 = pk.i1, i2 = pk.i2, maxIdx = pk.maxIdx;
-  var seg = [];
-  for (var i = i1; i <= i2; i++) seg.push(curve[i] !== null ? curve[i] : 0);
-  if (seg.length < 5) return null;
+// ── TAILING FACTOR ────────────────────────────────────────────
+function estimateTF() {
+  var pk    = S.peak.peak;
+  var curve = S.peak.curve;
+  var pa    = S.peak.plotArea;
+  if (!pk||!curve) return null;
 
-  var maxV = seg[maxIdx - i1];
-  var base = pk.baseAtApex;
-  var H    = maxV - base;
-  var level5 = base + H * 0.05;
+  var i1=pk.i1, i2=pk.i2, maxIdx=pk.maxIdx;
+  var seg=[];
+  for (var i=i1; i<=i2; i++) seg.push(curve[i]!==null?curve[i]:0);
+  if (seg.length<5) return null;
 
-  // Left edge at 5%
-  var leftEdge = 0;
-  for (var i = 0; i <= maxIdx-i1; i++) {
-    if (seg[i] >= level5) { leftEdge = i; break; }
-  }
+  var base    = pk.baseAtApex;
+  var maxV    = seg[maxIdx-i1];
+  var H       = maxV-base;
+  var level5  = base+H*0.05;
 
-  // Right edge at 5%
-  var rightEdge = seg.length-1;
-  for (var i = seg.length-1; i >= maxIdx-i1; i--) {
-    if (seg[i] >= level5) { rightEdge = i; break; }
-  }
+  var leftEdge=0;
+  for (var i=0; i<=maxIdx-i1; i++) { if(seg[i]>=level5){leftEdge=i;break;} }
+  var rightEdge=seg.length-1;
+  for (var i=seg.length-1; i>=maxIdx-i1; i--) { if(seg[i]>=level5){rightEdge=i;break;} }
 
-  var a = (maxIdx-i1) - leftEdge;
-  var b = rightEdge - (maxIdx-i1);
-  if (a <= 0) return null;
-  return (a+b) / (2*a);
+  var a=(maxIdx-i1)-leftEdge;
+  var b=rightEdge-(maxIdx-i1);
+  if (a<=0) return null;
+  return (a+b)/(2*a);
 }
 
-// ── RENDER RESULTS ───────────────────────────────────────────
+// ── RENDER RESULTS ────────────────────────────────────────────
 function renderResults(sn, tf, H, h) {
-  var methodLabels = { usp:'USP <621>', ep:'EP 2.2.46', pp:'Peak-to-peak' };
-  var snCls  = sn >= 10 ? 'ok' : sn >= 3 ? 'warn' : 'bad';
-  var snLbl  = sn >= 10 ? 'Aceptable (≥10 USP)' : sn >= 3 ? 'Límite (3–10)' : 'Insuficiente (<3)';
-  var tfCls  = tf === null ? 'warn' : (tf >= 0.8 && tf <= 2.0) ? 'ok' : (tf <= 2.5) ? 'warn' : 'bad';
-  var tfLbl  = tf === null ? 'No calculado' : (tf >= 0.8 && tf <= 2.0) ? 'Aceptable (0.8–2.0 USP)' : (tf <= 2.5) ? 'Límite (hasta 2.5)' : 'Fuera de rango (>2.5)';
-  var tfDisp = tf !== null ? tf.toFixed(2) : 'N/D';
+  var ml={usp:'USP <621>',ep:'EP 2.2.46',pp:'Peak-to-peak'};
+  var snC=sn>=10?'ok':sn>=3?'warn':'bad';
+  var snL=sn>=10?'Aceptable (≥10 USP)':sn>=3?'Límite (3–10)':'Insuficiente (<3)';
+  var tfC=tf===null?'warn':(tf>=0.8&&tf<=2.0)?'ok':tf<=2.5?'warn':'bad';
+  var tfL=tf===null?'No calculado':(tf>=0.8&&tf<=2.0)?'Aceptable (0.8–2.0 USP)':tf<=2.5?'Límite (hasta 2.5)':'Fuera de rango (>2.5)';
+  var tfD=tf!==null?tf.toFixed(2):'N/D';
+  var snI=sn>=10?'Pico cuantificable con buena exactitud.':sn>=3?'Pico detectable, cuantificación con mayor incertidumbre.':'En el límite de detección. Considerar optimización del método.';
+  var tfI=tf===null?'':('<br><br><strong>TF:</strong> '+(tf<0.8?'Fronting pronunciado — posible efecto de solvente o sobrecarga.':tf<=1.3?'Pico simétrico — excelente eficiencia.':tf<=2.0?'Tailing leve — aceptable para la mayoría de los métodos.':tf<=2.5?'Tailing moderado — puede afectar la cuantificación.':'Tailing severo — revisar columna, temperatura o pH.'));
 
-  var snInterp = sn >= 10
-    ? 'Pico cuantificable con buena exactitud.'
-    : sn >= 3 ? 'Pico detectable, cuantificación con mayor incertidumbre.'
-    : 'En el límite de detección. Considerar optimización del método.';
-
-  var tfInterp = tf === null ? '' :
-    '<br><br><strong>TF:</strong> ' + (
-      tf < 0.8  ? 'Fronting pronunciado — posible efecto de solvente o sobrecarga.' :
-      tf <= 1.3 ? 'Pico simétrico — excelente eficiencia.' :
-      tf <= 2.0 ? 'Tailing leve — aceptable para la mayoría de los métodos.' :
-      tf <= 2.5 ? 'Tailing moderado — puede afectar la cuantificación.' :
-                  'Tailing severo — revisar columna, temperatura o pH de fase móvil.');
-
-  var sec = document.getElementById('results');
+  var sec=document.getElementById('results');
   sec.classList.remove('hidden');
-  sec.innerHTML =
-    '<div class="result-card">' +
-      '<div class="result-header">' +
-        '<div><div class="result-title">Resultado del análisis</div>' +
-        '<span class="result-tag">'+methodLabels[S.method]+'</span></div>' +
-        '<div style="font-size:11px;color:#bbb;text-align:right">orientativo<br>no regulatorio</div>' +
-      '</div>' +
-      '<div class="metrics">' +
-        '<div class="metric"><div class="metric-label">S / N</div>' +
-          '<div class="metric-val '+snCls+'">'+sn.toFixed(1)+'</div>' +
-          '<div class="metric-detail">H='+Math.round(H)+' · h='+Math.round(h)+'</div></div>' +
-        '<div class="metric"><div class="metric-label">Tailing Factor</div>' +
-          '<div class="metric-val '+tfCls+'">'+tfDisp+'</div>' +
-          '<div class="metric-detail">USP &lt;621&gt; al 5%</div></div>' +
-      '</div>' +
-      '<div class="status '+snCls+'"><div class="sdot"></div>S/N: '+snLbl+'</div>' +
-      '<div class="status '+tfCls+'"><div class="sdot"></div>TF: '+tfLbl+'</div>' +
-      '<div class="obs"><strong>S/N:</strong> '+snInterp+tfInterp+'</div>' +
-      '<div class="divider"></div>' +
-      '<div class="disclaimer">Resultado orientativo — no válido para documentación regulatoria.<br>' +
-        'Verificar siempre en el software validado del equipo.<br><br>' +
-        '<a href="https://www.agsanalitica.com.ar" target="_blank">AGS Analítica S.A.</a> · Soporte técnico en cromatografía · Buenos Aires' +
-      '</div>' +
-    '</div>' +
-    '<button class="btn btn-ghost" onclick="location.reload()" style="border:1.5px solid #ddd">Nuevo análisis</button>';
-
-  sec.scrollIntoView({ behavior:'smooth' });
-  document.getElementById('dot3').className = 'dot done';
-  document.getElementById('dot3').textContent = '✓';
+  sec.innerHTML=
+    '<div class="result-card">'+
+      '<div class="result-header">'+
+        '<div><div class="result-title">Resultado del análisis</div>'+
+        '<span class="result-tag">'+ml[S.method]+'</span></div>'+
+        '<div style="font-size:11px;color:#bbb;text-align:right">orientativo<br>no regulatorio</div>'+
+      '</div>'+
+      '<div class="metrics">'+
+        '<div class="metric"><div class="metric-label">S / N</div>'+
+          '<div class="metric-val '+snC+'">'+sn.toFixed(1)+'</div>'+
+          '<div class="metric-detail">H='+Math.round(H)+' · h='+Math.round(h)+'</div></div>'+
+        '<div class="metric"><div class="metric-label">Tailing Factor</div>'+
+          '<div class="metric-val '+tfC+'">'+tfD+'</div>'+
+          '<div class="metric-detail">USP &lt;621&gt; al 5%</div></div>'+
+      '</div>'+
+      '<div class="status '+snC+'"><div class="sdot"></div>S/N: '+snL+'</div>'+
+      '<div class="status '+tfC+'"><div class="sdot"></div>TF: '+tfL+'</div>'+
+      '<div class="obs"><strong>S/N:</strong> '+snI+tfI+'</div>'+
+      '<div class="divider"></div>'+
+      '<div class="disclaimer">Resultado orientativo — no válido para documentación regulatoria.<br>'+
+        'Verificar siempre en el software validado del equipo.<br><br>'+
+        '<a href="https://www.agsanalitica.com.ar" target="_blank">AGS Analítica S.A.</a> · Soporte técnico en cromatografía · Buenos Aires'+
+      '</div>'+
+    '</div>'+
+    '<button class="btn btn-ghost" onclick="location.reload()" style="border:1.5px solid #ddd;margin-top:6px">Nuevo análisis</button>';
+  sec.scrollIntoView({behavior:'smooth'});
+  document.getElementById('dot3').className='stepdot done';
+  document.getElementById('dot3').textContent='✓';
 }
 </script>
 </body>
