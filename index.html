@@ -5,819 +5,793 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Analizador de Cromatogramas — AGS Analítica</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
-.app { max-width: 440px; margin: 0 auto; padding: 0.75rem 0.75rem 3rem; }
-
-.header { text-align: center; padding: 1.25rem 0 1rem; }
-.logo { display: inline-flex; align-items: center; gap: 6px; background: #0B2545; color: #fff; padding: 5px 14px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 8px; }
-.app-title { font-size: 18px; font-weight: 700; color: #1a1a2e; }
-.app-sub { font-size: 12px; color: #888; margin-top: 3px; }
-
-.card { background: #fff; border-radius: 12px; padding: 1rem 1.1rem; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
-.card-title { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-.stepdot { width: 22px; height: 22px; border-radius: 50%; background: #ccc; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-.stepdot.active { background: #378ADD; }
-.stepdot.done { background: #1D9E75; }
-
-.guide-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
-.guide-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #555; padding: 7px 10px; background: #f8f9fa; border-radius: 8px; line-height: 1.4; }
-.guide-item.ok   { background: #E1F5EE; color: #0F6E56; }
-.guide-item.warn { background: #FAEEDA; color: #854F0B; }
-.guide-item.bad  { background: #FCEBEB; color: #A32D2D; }
-.gi { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-
-.upload-zone { position: relative; width: 100%; padding: 18px 14px; border: 2px dashed #c8d0e0; border-radius: 10px; background: #f8faff; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.upload-zone input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 16px; }
-.upload-icon { font-size: 30px; }
-.upload-title { font-size: 14px; font-weight: 600; color: #1a1a2e; }
-.upload-hint { font-size: 11px; color: #888; }
-
-/* Canvas area - allows pinch zoom */
-
-.canvas-outer canvas { display: block; max-width: 100%; height: auto; cursor: crosshair; touch-action: pinch-zoom; }
-.canvas-hint { font-size: 11px; color: #555; text-align: center; margin-bottom: 5px; line-height: 1.5; min-height: 32px; }
-
-.scale-section { margin-bottom: 10px; }
-.scale-title { font-size: 12px; font-weight: 600; color: #444; margin-bottom: 7px; }
-.scale-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.field { display: flex; flex-direction: column; gap: 3px; }
-.field label { font-size: 11px; color: #777; }
-.field input { font-size: 15px; padding: 8px 10px; border: 1.5px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a2e; width: 100%; }
-.field input:focus { outline: none; border-color: #0B2545; }
-
-.btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; margin-top: 6px; }
-.btn-primary { background: #0B2545; color: #fff; }
-.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
-.btn-ghost { background: #fff; color: #666; border: 1.5px solid #ddd; }
-.btn-warn  { background: #FAEEDA; color: #854F0B; border: none; }
-
-.method-row { display: flex; gap: 6px; margin-bottom: 6px; }
-.mbtn { flex: 1; padding: 8px 4px; font-size: 11px; font-weight: 600; border: 1.5px solid #ddd; border-radius: 8px; background: #fff; color: #777; cursor: pointer; text-align: center; }
-.mbtn.sel { background: #0B2545; color: #fff; border-color: #0B2545; }
-.method-desc { font-size: 11px; color: #888; padding: 7px 9px; background: #f8f8f8; border-radius: 7px; line-height: 1.55; }
-
-.result-card { background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 10px; }
-.result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-.result-title { font-size: 15px; font-weight: 700; color: #1a1a2e; }
-.result-tag { font-size: 10px; padding: 3px 8px; border-radius: 4px; background: #E6F1FB; color: #185FA5; font-weight: 700; margin-top: 3px; display: inline-block; }
-.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.metric { background: #f8f9fa; border-radius: 10px; padding: 12px 14px; }
-.metric-label { font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
-.metric-val { font-size: 28px; font-weight: 800; line-height: 1; }
-.metric-val.ok   { color: #1D9E75; }
-.metric-val.warn { color: #BA7517; }
-.metric-val.bad  { color: #E24B4A; }
-.metric-detail { font-size: 10px; color: #bbb; margin-top: 3px; }
-.status { display: flex; align-items: center; gap: 7px; padding: 9px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; margin-bottom: 5px; }
-.status .sdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.status.ok   { background: #E1F5EE; color: #0F6E56; } .status.ok   .sdot { background: #1D9E75; }
-.status.warn { background: #FAEEDA; color: #854F0B; } .status.warn .sdot { background: #BA7517; }
-.status.bad  { background: #FCEBEB; color: #A32D2D; } .status.bad  .sdot { background: #E24B4A; }
-.obs { background: #f8f9fa; border-radius: 9px; padding: 10px 12px; margin: 10px 0; font-size: 12px; color: #555; line-height: 1.65; }
-.obs strong { color: #1a1a2e; }
-.divider { height: 1px; background: #f0f0f0; margin: 10px 0; }
-.disclaimer { font-size: 10px; color: #bbb; text-align: center; line-height: 1.6; }
-.disclaimer a { color: #0B2545; text-decoration: none; }
-.hidden { display: none !important; }
-.canvas-hint-zoom { font-size: 11px; color: #888; text-align:center; margin-bottom:4px; }
-.canvas-outer { width: 100%; border-radius: 10px; background: #222; margin-bottom: 8px; overflow: hidden; }
-.canvas-outer canvas { display: block; width: 100%; height: auto; cursor: default; touch-action: pan-x pan-y pinch-zoom; }
-.canvas-outer canvas.draw-mode { cursor: crosshair; touch-action: none; }
-.btn-draw { width: 100%; padding: 12px; border: 2px solid #378ADD; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; background: #fff; color: #378ADD; margin-top: 6px; transition: all 0.15s; }
-.btn-draw.active { background: #378ADD; color: #fff; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;min-height:100vh}
+.wrap{max-width:420px;margin:0 auto;padding:12px 12px 48px}
+.logo{display:inline-flex;align-items:center;gap:6px;background:#0B2545;color:#fff;padding:4px 12px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.06em;margin-bottom:8px}
+.app-title{font-size:17px;font-weight:700;color:#1a1a2e;text-align:center}
+.app-sub{font-size:11px;color:#888;text-align:center;margin-bottom:14px}
+.card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card-title{font-size:13px;font-weight:700;color:#1a1a2e;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.stepdot{width:22px;height:22px;border-radius:50%;background:#ccc;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.stepdot.active{background:#378ADD}
+.stepdot.done{background:#1D9E75}
+.hint{font-size:11px;color:#555;line-height:1.5;text-align:center;padding:5px 0;min-height:30px}
+.upload-zone{position:relative;border:2px dashed #c8d0e0;border-radius:10px;padding:18px 14px;text-align:center;background:#f8faff;display:flex;flex-direction:column;align-items:center;gap:5px}
+.upload-zone input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.uicon{font-size:28px}
+.utitle{font-size:14px;font-weight:600;color:#1a1a2e}
+.usub{font-size:11px;color:#888}
+.canvas-wrap{width:100%;border-radius:8px;overflow:hidden;background:#111;margin:8px 0}
+canvas{display:block;width:100%;height:auto}
+canvas.selecting{touch-action:none;cursor:crosshair}
+canvas.drawing{touch-action:none;cursor:crosshair}
+canvas.free{touch-action:pan-x pan-y pinch-zoom;cursor:default}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.field{display:flex;flex-direction:column;gap:3px}
+.field label{font-size:11px;color:#666}
+.field input{font-size:14px;padding:7px 10px;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#1a1a2e;width:100%}
+.field input:focus{outline:none;border-color:#0B2545}
+.btn{width:100%;padding:12px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px}
+.btn-primary{background:#0B2545;color:#fff}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{background:#fff;color:#555;border:1.5px solid #ddd}
+.btn-blue{background:#fff;color:#378ADD;border:2px solid #378ADD}
+.btn-blue.on{background:#378ADD;color:#fff}
+.btn-amber{background:#fff;color:#854F0B;border:1.5px solid #BA7517}
+.checks{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.chk{font-size:11px;padding:6px 10px;border-radius:7px;display:flex;align-items:flex-start;gap:7px;line-height:1.4}
+.chk.ok{background:#E1F5EE;color:#0F6E56}
+.chk.bad{background:#FCEBEB;color:#A32D2D}
+.mrow{display:flex;gap:6px;margin-bottom:6px}
+.mbtn{flex:1;padding:8px 4px;font-size:11px;font-weight:700;border:1.5px solid #ddd;border-radius:8px;background:#fff;color:#777;cursor:pointer;text-align:center}
+.mbtn.sel{background:#0B2545;color:#fff;border-color:#0B2545}
+.mdesc{font-size:11px;color:#888;padding:6px 8px;background:#f8f8f8;border-radius:7px;line-height:1.55}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.metric{background:#f8f9fa;border-radius:9px;padding:10px 12px}
+.mlabel{font-size:10px;color:#999;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.mval{font-size:26px;font-weight:800;line-height:1}
+.mval.ok{color:#1D9E75}.mval.warn{color:#BA7517}.mval.bad{color:#E24B4A}
+.mdet{font-size:10px;color:#bbb;margin-top:2px}
+.status{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:7px;font-size:12px;font-weight:600;margin-bottom:4px}
+.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.status.ok{background:#E1F5EE;color:#0F6E56}.status.ok .sdot{background:#1D9E75}
+.status.warn{background:#FAEEDA;color:#854F0B}.status.warn .sdot{background:#BA7517}
+.status.bad{background:#FCEBEB;color:#A32D2D}.status.bad .sdot{background:#E24B4A}
+.obs{background:#f8f9fa;border-radius:8px;padding:10px;font-size:12px;color:#555;line-height:1.6;margin:8px 0}
+.disc{font-size:10px;color:#bbb;text-align:center;line-height:1.6;margin-top:8px;padding-top:8px;border-top:1px solid #f0f0f0}
+.disc a{color:#0B2545;text-decoration:none}
+.hidden{display:none!important}
+.sep{height:1px;background:#f0f0f0;margin:8px 0}
 </style>
 </head>
 <body>
-<div class="app">
-
-  <div class="header">
+<div class="wrap">
+  <div style="text-align:center;padding:14px 0 4px">
     <div class="logo">
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-        <circle cx="5" cy="5" r="4.5" stroke="#7FB3E0" stroke-width="1"/>
-        <polyline points="1.5,7 3.5,4 5.5,5.5 8.5,2" stroke="#7FB3E0" stroke-width="1.2" fill="none"/>
-      </svg>
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4.5" stroke="#7FB3E0" stroke-width="1"/><polyline points="1.5,7 3.5,4 5.5,5.5 8.5,2" stroke="#7FB3E0" stroke-width="1.2" fill="none"/></svg>
       AGS ANALÍTICA
     </div>
     <div class="app-title">Analizador de cromatogramas</div>
-    <div class="app-sub">S/N · Tailing Factor · USP / EP · orientativo</div>
+    <div class="app-sub">S/N · Tailing Factor · USP/EP · orientativo</div>
   </div>
 
-  <!-- PASO 1: PICO -->
-  <div class="card" id="card-peak">
-    <div class="card-title">
-      <div class="stepdot active" id="dot1">1</div>
-      Foto del pico
-    </div>
+  <!-- PASO 1 -->
+  <div class="card" id="card1">
+    <div class="card-title"><div class="stepdot active" id="dot1">1</div>Foto del pico</div>
 
-    <div id="peak-upload">
-      <div class="guide-list">
-        <div class="guide-item"><span class="gi">✓</span>Integrá el pico primero en el software — la línea de baseline debe ser visible</div>
-        <div class="guide-item"><span class="gi">🔍</span>El pico debe verse completo — inicio y fin sobre la baseline</div>
-        <div class="guide-item"><span class="gi">📏</span>La escala Y debe ser legible</div>
-        <div class="guide-item"><span class="gi">📐</span>Foto derecha, sin ángulo ni reflejo</div>
+    <!-- FASE A: upload -->
+    <div id="ph-upload">
+      <div class="checks">
+        <div class="chk ok"><span>✓</span>Integrá el pico primero — la línea de base debe ser visible en pantalla</div>
+        <div class="chk ok"><span>✓</span>El pico de interés debe verse completo con la escala Y legible</div>
       </div>
       <div class="upload-zone">
         <input type="file" id="file-peak" accept="image/*">
-        <div class="upload-icon">📷</div>
-        <div class="upload-title">Foto del pico</div>
-        <div class="upload-hint">PNG o JPG · cámara o galería</div>
+        <div class="uicon">📷</div>
+        <div class="utitle">Foto de la zona del pico</div>
+        <div class="usub">PNG o JPG · cámara o galería</div>
       </div>
     </div>
 
-    <div id="peak-editor" class="hidden">
-      <div id="peak-checks" class="guide-list"></div>
-
-      <div id="peak-canvas-area" class="hidden">
-        <div class="canvas-hint" id="peak-hint">
-          Usá dos dedos para hacer zoom.<br>
-          Luego <strong>arrastrá con un dedo</strong> sobre la baseline del pico (de izq a der o viceversa).
+    <!-- FASE B: selección de ventana -->
+    <div id="ph-select" class="hidden">
+      <div id="peak-checks" class="checks"></div>
+      <div id="ph-select-area" class="hidden">
+        <div class="hint" id="hint-select">Arrastrá sobre el pico de interés para seleccionarlo.</div>
+        <div class="canvas-wrap"><canvas id="peak-canvas-full"></canvas></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn btn-amber" onclick="redoSelect()" style="flex:1;margin:0">↩ Redibujar ventana</button>
+          <button class="btn btn-ghost" onclick="changePeakPhoto()" style="flex:1;margin:0">📷 Cambiar foto</button>
         </div>
-        <div class="canvas-hint" id="peak-hint">
-          Hacé zoom con pellizco para ver mejor la base del pico.<br>
-          Cuando estés listo, tocá <strong>Dibujar baseline</strong>.
-        </div>
-        <div class="canvas-outer" id="peak-outer">
-          <canvas id="peak-canvas"></canvas>
-        </div>
-        <button class="btn-draw" id="btn-draw-baseline" onclick="startDrawMode()">
-          ✏️ Dibujar baseline
-        </button>
-
-        <div class="scale-section">
-          <div class="scale-title">Escala Y — valores del eje</div>
-          <div class="scale-row">
-            <div class="field"><label>Valor máximo</label><input type="number" id="peak-ymax" placeholder="ej: 160000"></div>
-            <div class="field"><label>Valor mínimo</label><input type="number" id="peak-ymin" placeholder="ej: 0"></div>
-          </div>
-        </div>
-
-        <button class="btn btn-primary" id="btn-peak-ok" onclick="confirmPeak()" disabled>Confirmar pico →</button>
-
+        <button class="btn btn-primary" id="btn-crop" onclick="doCrop()" disabled style="margin-top:8px">Ampliar pico seleccionado →</button>
       </div>
-      <button class="btn btn-ghost" onclick="retake('peak')" style="margin-top:6px">Repetir foto</button>
+    </div>
+
+    <!-- FASE C: crop + línea de base -->
+    <div id="ph-draw" class="hidden">
+      <div class="hint" id="hint-draw">Trazá la línea de base con el dedo de izquierda a derecha.</div>
+      <div class="canvas-wrap"><canvas id="peak-canvas-crop"></canvas></div>
+      <button class="btn btn-blue" id="btn-draw-bl" onclick="toggleDraw()">✏ Trazar línea de base</button>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button class="btn btn-amber" onclick="redoDraw()" style="flex:1;margin:0">↩ Redibujar línea de base</button>
+        <button class="btn btn-amber" onclick="redoSelect()" style="flex:1;margin:0">↩ Redibujar ventana</button>
+        <button class="btn btn-ghost" onclick="changePeakPhoto()" style="flex:1;margin:0">📷 Cambiar foto</button>
+      </div>
+      <div class="sep"></div>
+      <div class="row2">
+        <div class="field"><label>Escala Y máximo</label><input type="number" id="peak-ymax" placeholder="ej: 160000"></div>
+        <div class="field"><label>Escala Y mínimo</label><input type="number" id="peak-ymin" placeholder="ej: 0"></div>
+      </div>
+      <button class="btn btn-primary" id="btn-peak-ok" onclick="confirmPeak()" disabled>Confirmar pico →</button>
     </div>
   </div>
 
-  <!-- PASO 2: RUIDO -->
-  <div class="card hidden" id="card-noise">
-    <div class="card-title">
-      <div class="stepdot" id="dot2">2</div>
-      Foto del ruido
-    </div>
-
-    <div id="noise-upload">
-      <div class="guide-list">
-        <div class="guide-item"><span class="gi">🔬</span>Hacé zoom en la línea base — sin pico</div>
-        <div class="guide-item"><span class="gi">〰️</span>La fluctuación debe ser visible</div>
-        <div class="guide-item"><span class="gi">📏</span>La escala Y debe ser legible</div>
+  <!-- PASO 2 -->
+  <div class="card hidden" id="card2">
+    <div class="card-title"><div class="stepdot" id="dot2">2</div>Foto del ruido</div>
+    <div id="nh-upload">
+      <div class="checks">
+        <div class="chk ok"><span>✓</span>Zoom en línea base sin pico — fluctuación visible con escala Y legible</div>
       </div>
       <div class="upload-zone">
         <input type="file" id="file-noise" accept="image/*">
-        <div class="upload-icon">📷</div>
-        <div class="upload-title">Foto del ruido</div>
-        <div class="upload-hint">PNG o JPG · región de línea base sin pico</div>
+        <div class="uicon">📷</div>
+        <div class="utitle">Foto del ruido</div>
+        <div class="usub">PNG o JPG · línea base sin pico</div>
       </div>
     </div>
-
-    <div id="noise-editor" class="hidden">
-      <div id="noise-checks" class="guide-list"></div>
-      <div id="noise-canvas-area" class="hidden">
-        <div class="canvas-hint" id="noise-hint">
-          Arrastrá para seleccionar la región de ruido.<br>Ajustá los bordes con los handles.
+    <div id="nh-editor" class="hidden">
+      <div id="noise-checks" class="checks"></div>
+      <div id="nh-area" class="hidden">
+        <div class="hint" id="hint-noise">Arrastrá para seleccionar la región de ruido.</div>
+        <div class="canvas-wrap"><canvas id="noise-canvas"></canvas></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn btn-amber" onclick="redoNoise()" style="flex:1;margin:0">↩ Redibujar selección</button>
+          <button class="btn btn-ghost" onclick="changeNoisePhoto()" style="flex:1;margin:0">📷 Cambiar foto</button>
         </div>
-        <div class="canvas-outer" id="noise-outer">
-          <canvas id="noise-canvas"></canvas>
-        </div>
-        <div class="scale-section">
-          <div class="scale-title">Escala Y — valores del eje</div>
-          <div class="scale-row">
-            <div class="field"><label>Valor máximo</label><input type="number" id="noise-ymax" placeholder="ej: 8000"></div>
-            <div class="field"><label>Valor mínimo</label><input type="number" id="noise-ymin" placeholder="ej: 0"></div>
-          </div>
+        <div class="row2">
+          <div class="field"><label>Escala Y máximo</label><input type="number" id="noise-ymax" placeholder="ej: 8000"></div>
+          <div class="field"><label>Escala Y mínimo</label><input type="number" id="noise-ymin" placeholder="ej: 0"></div>
         </div>
         <button class="btn btn-primary" id="btn-noise-ok" onclick="confirmNoise()" disabled>Confirmar ruido →</button>
       </div>
-      <button class="btn btn-ghost" onclick="retake('noise')" style="margin-top:6px">Repetir foto</button>
     </div>
   </div>
 
-  <!-- PASO 3: MÉTODO -->
-  <div class="card hidden" id="card-method">
-    <div class="card-title">
-      <div class="stepdot" id="dot3">3</div>
-      Método S/N
+  <!-- PASO 3 -->
+  <div class="card hidden" id="card3">
+    <div class="card-title"><div class="stepdot" id="dot3">3</div>Método S/N</div>
+    <div class="mrow">
+      <div class="mbtn sel" id="m-usp" onclick="selM('usp')">USP &lt;621&gt;</div>
+      <div class="mbtn" id="m-ep" onclick="selM('ep')">EP 2.2.46</div>
+      <div class="mbtn" id="m-pp" onclick="selM('pp')">Peak-to-peak</div>
     </div>
-    <div class="method-row">
-      <div class="mbtn sel" id="m-usp" onclick="selMethod('usp')">USP &lt;621&gt;</div>
-      <div class="mbtn" id="m-ep"  onclick="selMethod('ep')">EP 2.2.46</div>
-      <div class="mbtn" id="m-pp"  onclick="selMethod('pp')">Peak-to-peak</div>
-    </div>
-    <div class="method-desc" id="mdesc">
-      <strong>USP &lt;621&gt;:</strong> S/N = 2H/h. H = altura del pico desde la baseline. h = amplitud pico-a-pico del ruido.
-    </div>
+    <div class="mdesc" id="mdesc">S/N = 2H/h. H = altura desde la línea de base. h = amplitud pico-a-pico del ruido.</div>
     <button class="btn btn-primary" style="margin-top:10px" onclick="calculate()">Calcular S/N y Tailing Factor</button>
   </div>
 
   <div id="results" class="hidden"></div>
-
 </div>
+
 <script>
-var S = {
-  peak:  { img:null, src:null, curve:null, plotArea:null, baseline:null, peak:null, ymax:null, ymin:null, zoom:1 },
-  noise: { img:null, src:null, curve:null, plotArea:null, sel:null, noise:null, ymax:null, ymin:null, zoom:1 },
-  drag:  { active:false, which:null, startX:0, startY:0, mode:null },
-  drawMode: false,
-  method: 'usp'
+// ── STATE ──────────────────────────────────────────────────────
+var P = {
+  src: null,        // offscreen canvas (full image)
+  curve: null,      // full image curve
+  pa: null,         // plot area in full image
+  sel: null,        // {x1,y1,x2,y2} selection in full canvas coords
+  cropSrc: null,    // offscreen canvas (cropped)
+  cropCurve: null,  // curve of cropped image
+  cropPA: null,     // plot area of cropped image
+  bl: null,         // baseline in crop canvas coords {x1,y1,x2,y2}
+  pk: null,         // peak data
+  ctx_full: null,
+  ctx_crop: null,
+  ymax: null, ymin: null
 };
-
-
-
-
-
-
+var N = {
+  src: null, curve: null, pa: null,
+  sel: null, ns: null, ctx: null,
+  ymax: null, ymin: null
+};
+var drag = { on: false, which: null, sx: 0, sy: 0, ex: 0, ey: 0 };
+var peakPhase = 'upload'; // upload | select | draw
+var drawMode = false;
+var method = 'usp';
 
 var MDESC = {
-  usp: '<strong>USP &lt;621&gt;:</strong> S/N = 2H/h. H = altura desde la baseline. h = amplitud pico-a-pico del ruido.',
-  ep:  '<strong>EP 2.2.46:</strong> S/N = 2H/h. Ruido en región adyacente ≥ 20× ancho del pico.',
-  pp:  '<strong>Peak-to-peak:</strong> S/N = H / (h/2). Ruido como amplitud total pico-a-pico.'
+  usp: 'S/N = 2H/h. H = altura desde la línea de base. h = amplitud pico-a-pico del ruido.',
+  ep:  'S/N = 2H/h. Ruido en región adyacente ≥20× ancho del pico.',
+  pp:  'S/N = H/(h/2). Ruido como amplitud total pico-a-pico.'
 };
 
-// ── FILE INPUTS ───────────────────────────────────────────────
-document.getElementById('file-peak').onchange = function(){
-  if (this.files && this.files[0]) loadImage('peak', this.files[0]);
-};
-document.getElementById('file-noise').onchange = function(){
-  if (this.files && this.files[0]) loadImage('noise', this.files[0]);
-};
+function selM(m) {
+  method = m;
+  ['usp','ep','pp'].forEach(function(x){ document.getElementById('m-'+x).classList.toggle('sel', x===m); });
+  document.getElementById('mdesc').textContent = MDESC[m];
+}
 
-// ── IMAGE LOADING ─────────────────────────────────────────────
-function loadImage(which, file) {
+// ── FILE INPUTS ────────────────────────────────────────────────
+document.getElementById('file-peak').addEventListener('change', function(){
+  if (this.files && this.files[0]) loadImg('peak', this.files[0]);
+});
+document.getElementById('file-noise').addEventListener('change', function(){
+  if (this.files && this.files[0]) loadImg('noise', this.files[0]);
+});
+
+function changePeakPhoto() {
+  P = { src:null, curve:null, pa:null, sel:null, cropSrc:null, cropCurve:null, cropPA:null, bl:null, pk:null, ctx_full:null, ctx_crop:null, ymax:null, ymin:null };
+  drawMode = false;
+  peakPhase = 'upload';
+  document.getElementById('file-peak').value = '';
+  document.getElementById('ph-upload').classList.remove('hidden');
+  document.getElementById('ph-select').classList.add('hidden');
+  document.getElementById('ph-draw').classList.add('hidden');
+}
+
+function changeNoisePhoto() {
+  N = { src:null, curve:null, pa:null, sel:null, ns:null, ctx:null, ymax:null, ymin:null };
+  document.getElementById('file-noise').value = '';
+  document.getElementById('nh-upload').classList.remove('hidden');
+  document.getElementById('nh-editor').classList.add('hidden');
+  document.getElementById('nh-area').classList.add('hidden');
+}
+
+// ── IMAGE LOADING ──────────────────────────────────────────────
+function loadImg(w, file) {
   var url = URL.createObjectURL(file);
   var img = new Image();
   img.onload = function() {
-    S[which].img = img;
-    document.getElementById(which+'-upload').classList.add('hidden');
-    document.getElementById(which+'-editor').classList.remove('hidden');
-    processImage(which);
+    var oc = document.createElement('canvas');
+    var sc = Math.min(1, 1200 / img.width);
+    oc.width  = Math.round(img.width  * sc);
+    oc.height = Math.round(img.height * sc);
+    var octx = oc.getContext('2d', { willReadFrequently: true });
+    octx.drawImage(img, 0, 0, oc.width, oc.height);
+    URL.revokeObjectURL(url);
+    if (w === 'peak') {
+      P.src = oc;
+      processPeakFull();
+    } else {
+      N.src = oc;
+      processNoise();
+    }
   };
   img.src = url;
 }
 
-function retake(which) {
-  S[which] = { img:null, src:null, curve:null, plotArea:null, baseline:null, sel:null, peak:null, noise:null, ymax:null, ymin:null };
-  document.getElementById('file-'+which).value = '';
-  document.getElementById(which+'-upload').classList.remove('hidden');
-  document.getElementById(which+'-editor').classList.add('hidden');
-  document.getElementById(which+'-canvas-area').classList.add('hidden');
-  document.getElementById(which+'-checks').innerHTML = '';
+// ── PEAK FULL IMAGE ────────────────────────────────────────────
+function processPeakFull() {
+  document.getElementById('ph-upload').classList.add('hidden');
+  document.getElementById('ph-select').classList.remove('hidden');
+  var chkDiv = document.getElementById('peak-checks');
+  chkDiv.innerHTML = '<div class="chk ok"><span>⏳</span>Analizando imagen...</div>';
+
+  setTimeout(function() {
+    var pa = detectPA(P.src);
+    var curve = extractCurve(P.src, pa);
+    P.pa = pa; P.curve = curve;
+
+    var valid = curve.filter(function(v){ return v !== null; });
+    var checks = [];
+    if ((pa.w * pa.h) / (P.src.width * P.src.height) < 0.12) {
+      checks.push({ cls:'bad', t:'El gráfico ocupa muy poco — acercate más a la pantalla' });
+    } else {
+      checks.push({ cls:'ok', t:'Área del gráfico detectada' });
+    }
+    if (valid.length < pa.w * 0.2) {
+      checks.push({ cls:'bad', t:'No se detecta trazo — verificá la foto' });
+    } else {
+      checks.push({ cls:'ok', t:'Trazo del cromatograma detectado' });
+    }
+    chkDiv.innerHTML = checks.map(function(c){
+      return '<div class="chk '+c.cls+'"><span>'+(c.cls==='ok'?'✓':'✗')+'</span>'+c.t+'</div>';
+    }).join('');
+
+    if (checks.some(function(c){ return c.cls === 'bad'; })) return;
+
+    document.getElementById('ph-select-area').classList.remove('hidden');
+    peakPhase = 'select';
+    setupFullCanvas();
+  }, 50);
 }
 
-// ── PROCESS IMAGE ─────────────────────────────────────────────
-function processImage(which) {
-  var img = S[which].img;
-  var checksDiv = document.getElementById(which+'-checks');
-  checksDiv.innerHTML = '<div class="guide-item"><span class="gi">⏳</span>Analizando imagen...</div>';
+function setupFullCanvas() {
+  var el = document.getElementById('peak-canvas-full');
+  el.width  = P.src.width;
+  el.height = P.src.height;
+  var ctx = el.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(P.src, 0, 0);
+  P.ctx_full = ctx;
+  drawBorderOn(ctx, P.pa);
+  el.classList.remove('free', 'drawing');
+  el.classList.add('selecting');
+  bindCanvas('full', el);
+  document.getElementById('hint-select').textContent = 'Arrastrá sobre el pico de interés para seleccionarlo.';
+  document.getElementById('btn-crop').disabled = true;
+}
+
+function redoSelect() {
+  P.sel = null; P.bl = null; P.pk = null; P.cropSrc = null;
+  drawMode = false;
+  document.getElementById('ph-draw').classList.add('hidden');
+  document.getElementById('ph-select').classList.remove('hidden');
+  document.getElementById('ph-select-area').classList.remove('hidden');
+  document.getElementById('btn-peak-ok').disabled = true;
+  setupFullCanvas();
+}
+
+// ── CROP ───────────────────────────────────────────────────────
+function doCrop() {
+  if (!P.sel) return;
+  var s = P.sel;
+  // Add padding
+  var pad = 20;
+  var cx1 = Math.max(0, s.x1 - pad);
+  var cy1 = Math.max(0, s.y1 - pad);
+  var cx2 = Math.min(P.src.width,  s.x2 + pad);
+  var cy2 = Math.min(P.src.height, s.y2 + pad);
+  var cw = cx2 - cx1, ch = cy2 - cy1;
 
   var oc = document.createElement('canvas');
-  var maxW = 1400;
-  var sc = Math.min(1, maxW / img.width);
-  oc.width  = Math.round(img.width  * sc);
-  oc.height = Math.round(img.height * sc);
+  oc.width = cw; oc.height = ch;
   var octx = oc.getContext('2d', { willReadFrequently: true });
-  octx.drawImage(img, 0, 0, oc.width, oc.height);
-  S[which].src = oc;
+  octx.drawImage(P.src, cx1, cy1, cw, ch, 0, 0, cw, ch);
 
-  var pa = detectPlotArea(oc, octx);
-  S[which].plotArea = pa;
+  P.cropSrc = oc;
+  P.cropPA  = { x: 0, y: 0, w: cw, h: ch, bg: P.pa.bg };
+  P.cropCurve = extractCurve(oc, P.cropPA);
 
-  var curve = extractCurve(oc, octx, pa);
-  S[which].curve = curve;
+  document.getElementById('ph-select').classList.add('hidden');
+  document.getElementById('ph-draw').classList.remove('hidden');
+  peakPhase = 'draw';
 
-  var checks = validateImage(pa, curve, oc, which);
-  renderChecks(checksDiv, checks);
-  if (!checks.ok) return;
-
-  document.getElementById(which+'-canvas-area').classList.remove('hidden');
-  setupCanvas(which);
+  setupCropCanvas();
 }
 
-// ── PLOT AREA DETECTION ───────────────────────────────────────
-function detectPlotArea(canvas, ctx) {
-  var w = canvas.width, h = canvas.height;
-  var data = ctx.getImageData(0, 0, w, h).data;
-  function px(x,y){ var i=(y*w+x)*4; return {r:data[i],g:data[i+1],b:data[i+2]}; }
-  function diff(a,b){ return Math.abs(a.r-b.r)+Math.abs(a.g-b.g)+Math.abs(a.b-b.b); }
-  var bg = px(Math.floor(w*0.7), Math.floor(h*0.1));
-  var left = Math.floor(w*0.04);
-  for (var x=Math.floor(w*0.02); x<Math.floor(w*0.3); x++) {
-    var n=0; for (var y=Math.floor(h*0.1); y<Math.floor(h*0.8); y++) { if(diff(px(x,y),bg)>35) n++; }
-    if (n<4) left=x; else break;
-  }
-  var bottom = Math.floor(h*0.88);
-  for (var y2=Math.floor(h*0.95); y2>Math.floor(h*0.6); y2--) {
-    var n2=0; for (var x2=Math.floor(w*0.1); x2<Math.floor(w*0.9); x2++) { if(diff(px(x2,y2),bg)>35) n2++; }
-    if (n2<6) bottom=y2; else break;
-  }
-  return { x:left+2, y:Math.floor(h*0.02), w:Math.floor(w*0.97)-left-2, h:bottom-Math.floor(h*0.02), bg:bg };
+function setupCropCanvas() {
+  var el = document.getElementById('peak-canvas-crop');
+  el.width  = P.cropSrc.width;
+  el.height = P.cropSrc.height;
+  var ctx = el.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(P.cropSrc, 0, 0);
+  P.ctx_crop = ctx;
+  el.classList.remove('selecting', 'drawing');
+  el.classList.add('free');
+  bindCanvas('crop', el);
+  document.getElementById('hint-draw').textContent = 'Trazá la línea de base con o sin zoom. Tocá "Trazar línea de base" cuando estés listo.';
+  document.getElementById('btn-draw-bl').classList.remove('on');
+  document.getElementById('btn-draw-bl').textContent = '✏ Trazar línea de base';
+  document.getElementById('btn-peak-ok').disabled = true;
 }
 
-// ── CURVE EXTRACTION ──────────────────────────────────────────
-function extractCurve(canvas, ctx, pa) {
+function redoDraw() {
+  P.bl = null; P.pk = null;
+  drawMode = false;
+  setupCropCanvas();
+}
+
+// ── CANVAS BINDING ─────────────────────────────────────────────
+var _bound = {};
+function bindCanvas(id, el) {
+  if (_bound[id]) return;
+  _bound[id] = true;
+  el.addEventListener('mousedown',  function(e){ onDown(e, id); }, false);
+  el.addEventListener('mousemove',  function(e){ onMove(e, id); }, false);
+  el.addEventListener('mouseup',    function(e){ onUp(e, id);   }, false);
+  el.addEventListener('touchstart', function(e){
+    if (e.touches.length === 1 && shouldIntercept(id)) {
+      e.preventDefault(); onDown(e.touches[0], id);
+    }
+  }, { passive: false });
+  el.addEventListener('touchmove', function(e){
+    if (drag.on && drag.which === id) { e.preventDefault(); onMove(e.touches[0], id); }
+  }, { passive: false });
+  el.addEventListener('touchend', function(e){
+    if (drag.on && drag.which === id) { e.preventDefault(); onUp(e.changedTouches[0], id); }
+  }, { passive: false });
+}
+
+function shouldIntercept(id) {
+  if (id === 'full')  return true;
+  if (id === 'crop')  return drawMode;
+  if (id === 'noise') return true;
+  return false;
+}
+
+function gp(e, id) {
+  var elId = id === 'full' ? 'peak-canvas-full' : id === 'crop' ? 'peak-canvas-crop' : 'noise-canvas';
+  var el = document.getElementById(elId);
+  var r  = el.getBoundingClientRect();
+  return {
+    x: (e.clientX - r.left) * (el.width  / r.width),
+    y: (e.clientY - r.top)  * (el.height / r.height)
+  };
+}
+
+function onDown(e, id) {
+  var p = gp(e, id);
+  drag = { on: true, which: id, sx: p.x, sy: p.y, ex: p.x, ey: p.y };
+}
+function onMove(e, id) {
+  if (!drag.on || drag.which !== id) return;
+  var p = gp(e, id);
+  drag.ex = p.x; drag.ey = p.y;
+  if (id === 'full')  redrawFull(true);
+  if (id === 'crop')  redrawCrop(true);
+  if (id === 'noise') redrawNoise(true);
+}
+function onUp(e, id) {
+  if (!drag.on) return;
+  drag.on = false;
+  if (id === 'full')  commitSelect();
+  if (id === 'crop')  commitBL();
+  if (id === 'noise') commitNoise();
+}
+
+// ── FULL CANVAS DRAW ───────────────────────────────────────────
+function redrawFull(dragging) {
+  var ctx = P.ctx_full;
+  ctx.drawImage(P.src, 0, 0);
+  drawBorderOn(ctx, P.pa);
+  if (P.sel && !dragging) drawSelection(ctx, P.sel);
+  if (dragging) {
+    var x1=Math.min(drag.sx,drag.ex), y1=Math.min(drag.sy,drag.ey);
+    var x2=Math.max(drag.sx,drag.ex), y2=Math.max(drag.sy,drag.ey);
+    ctx.fillStyle = 'rgba(29,158,117,0.15)';
+    ctx.fillRect(x1, y1, x2-x1, y2-y1);
+    ctx.strokeStyle = '#1D9E75'; ctx.lineWidth = 2; ctx.setLineDash([4,3]);
+    ctx.strokeRect(x1, y1, x2-x1, y2-y1);
+    ctx.setLineDash([]);
+  }
+}
+
+function drawSelection(ctx, sel) {
+  ctx.fillStyle = 'rgba(29,158,117,0.15)';
+  ctx.fillRect(sel.x1, sel.y1, sel.x2-sel.x1, sel.y2-sel.y1);
+  ctx.strokeStyle = '#1D9E75'; ctx.lineWidth = 2.5;
+  ctx.strokeRect(sel.x1, sel.y1, sel.x2-sel.x1, sel.y2-sel.y1);
+}
+
+function commitSelect() {
+  var x1=Math.min(drag.sx,drag.ex), y1=Math.min(drag.sy,drag.ey);
+  var x2=Math.max(drag.sx,drag.ex), y2=Math.max(drag.sy,drag.ey);
+  if (x2-x1 < 10 || y2-y1 < 10) return;
+  P.sel = { x1:x1, y1:y1, x2:x2, y2:y2 };
+  redrawFull(false);
+  document.getElementById('btn-crop').disabled = false;
+  document.getElementById('hint-select').textContent = '✓ Pico seleccionado. Tocá "Ampliar" o redibujá la ventana.';
+}
+
+// ── CROP CANVAS DRAW ───────────────────────────────────────────
+function toggleDraw() {
+  drawMode = !drawMode;
+  var el  = document.getElementById('peak-canvas-crop');
+  var btn = document.getElementById('btn-draw-bl');
+  if (drawMode) {
+    el.classList.remove('free'); el.classList.add('drawing');
+    btn.classList.add('on');
+    btn.textContent = '✏ Dibujando... arrastrá sobre la línea de base';
+    document.getElementById('hint-draw').textContent = 'Modo dibujo activo — arrastrá de izq a der sobre la línea de base del pico.';
+  } else {
+    el.classList.remove('drawing'); el.classList.add('free');
+    btn.classList.remove('on');
+    btn.textContent = P.bl ? '✏ Redibujar línea de base' : '✏ Trazar línea de base';
+    document.getElementById('hint-draw').textContent = P.bl ? '✓ Línea de base trazada. Verificá o redibujá si es necesario.' : 'Activá el modo dibujo para trazar la línea de base.';
+  }
+}
+
+function redrawCrop(dragging) {
+  var ctx = P.ctx_crop;
+  ctx.drawImage(P.cropSrc, 0, 0);
+  if (P.bl && !dragging) drawBLCommitted();
+  if (dragging && drawMode) {
+    ctx.strokeStyle = 'rgba(55,138,221,0.8)'; ctx.lineWidth = 2.5; ctx.setLineDash([5,3]);
+    ctx.beginPath(); ctx.moveTo(drag.sx, drag.sy); ctx.lineTo(drag.ex, drag.ey); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+function commitBL() {
+  if (!drawMode) return;
+  var x1 = Math.min(drag.sx, drag.ex), y1 = drag.sx < drag.ex ? drag.sy : drag.ey;
+  var x2 = Math.max(drag.sx, drag.ex), y2 = drag.sx < drag.ex ? drag.ey : drag.sy;
+  if (x2 - x1 < 8) { toggleDraw(); return; }
+
+  var curve = P.cropCurve;
+  var cw    = P.cropSrc.width, ch = P.cropSrc.height;
+  var i1    = Math.max(0, Math.round(x1));
+  var i2    = Math.min(curve.length-1, Math.round(x2));
+  var maxV  = -Infinity, maxI = i1;
+  for (var i = i1; i <= i2; i++) {
+    if (curve[i] !== null && curve[i] > maxV) { maxV = curve[i]; maxI = i; }
+  }
+
+  var apX   = maxI;
+  var apY   = (1 - maxV) * ch;
+  var frac  = (x2-x1) > 0 ? (apX - x1) / (x2 - x1) : 0.5;
+  frac = Math.max(0, Math.min(1, frac));
+  var baseY = y1 + frac * (y2 - y1);
+  var baseNorm = 1 - baseY / ch;
+  if (baseY < apY) baseY = apY + 10;
+
+  P.bl = { x1:x1, y1:y1, x2:x2, y2:y2 };
+  P.pk = { maxV:maxV, maxI:maxI, baseNorm:baseNorm, baseY:baseY, apY:apY, i1:i1, i2:i2 };
+
+  drawMode = false;
+  var el = document.getElementById('peak-canvas-crop');
+  el.classList.remove('drawing'); el.classList.add('free');
+  var btn = document.getElementById('btn-draw-bl');
+  btn.classList.remove('on');
+  btn.textContent = '✏ Redibujar línea de base';
+  document.getElementById('hint-draw').textContent = '✓ Línea de base trazada. Verificá o redibujá si es necesario.';
+  document.getElementById('btn-peak-ok').disabled = false;
+  redrawCrop(false);
+  drawBLCommitted();
+}
+
+function drawBLCommitted() {
+  var ctx = P.ctx_crop, bl = P.bl, pk = P.pk, ch = P.cropSrc.height;
+  if (!bl || !pk) return;
+  // Línea de base azul
+  ctx.strokeStyle = '#378ADD'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(bl.x1, bl.y1); ctx.lineTo(bl.x2, bl.y2); ctx.stroke();
+  ctx.fillStyle = '#378ADD';
+  ctx.beginPath(); ctx.arc(bl.x1, bl.y1, 5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(bl.x2, bl.y2, 5, 0, Math.PI*2); ctx.fill();
+  // Ápex rojo
+  var apX = pk.maxI;
+  ctx.fillStyle = '#E24B4A';
+  ctx.beginPath(); ctx.arc(apX, pk.apY, 6, 0, Math.PI*2); ctx.fill();
+  // H rojo
+  ctx.strokeStyle = '#E24B4A'; ctx.lineWidth = 3; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(apX, pk.apY); ctx.lineTo(apX, pk.baseY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#E24B4A'; ctx.font = 'bold 15px sans-serif';
+  ctx.fillText('H', apX + 8, (pk.apY + pk.baseY) / 2 + 5);
+}
+
+// ── NOISE ──────────────────────────────────────────────────────
+function processNoise() {
+  document.getElementById('nh-upload').classList.add('hidden');
+  document.getElementById('nh-editor').classList.remove('hidden');
+  var chkDiv = document.getElementById('noise-checks');
+  chkDiv.innerHTML = '<div class="chk ok"><span>⏳</span>Analizando imagen...</div>';
+  setTimeout(function() {
+    var pa = detectPA(N.src);
+    var curve = extractCurve(N.src, pa);
+    N.pa = pa; N.curve = curve;
+    var valid = curve.filter(function(v){ return v !== null; });
+    var checks = [];
+    if ((pa.w*pa.h)/(N.src.width*N.src.height) < 0.12)
+      checks.push({ cls:'bad', t:'El gráfico ocupa muy poco' });
+    else checks.push({ cls:'ok', t:'Área del gráfico detectada' });
+    if (valid.length < pa.w * 0.2)
+      checks.push({ cls:'bad', t:'No se detecta trazo' });
+    else checks.push({ cls:'ok', t:'Trazo detectado' });
+    chkDiv.innerHTML = checks.map(function(c){
+      return '<div class="chk '+c.cls+'"><span>'+(c.cls==='ok'?'✓':'✗')+'</span>'+c.t+'</div>';
+    }).join('');
+    if (checks.some(function(c){ return c.cls === 'bad'; })) return;
+    document.getElementById('nh-area').classList.remove('hidden');
+    setupNoiseCanvas();
+  }, 50);
+}
+
+function setupNoiseCanvas() {
+  var el = document.getElementById('noise-canvas');
+  el.width  = N.src.width;
+  el.height = N.src.height;
+  var ctx = el.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(N.src, 0, 0);
+  N.ctx = ctx;
+  drawBorderOn(ctx, N.pa);
+  el.classList.add('selecting');
+  bindCanvas('noise', el);
+  document.getElementById('hint-noise').textContent = 'Arrastrá para seleccionar la región de ruido.';
+  document.getElementById('btn-noise-ok').disabled = true;
+}
+
+function redoNoise() {
+  N.sel = null; N.ns = null;
+  setupNoiseCanvas();
+}
+
+function redrawNoise(dragging) {
+  var ctx = N.ctx, pa = N.pa;
+  ctx.drawImage(N.src, 0, 0);
+  drawBorderOn(ctx, pa);
+  if (dragging && drag.on) {
+    var x1=Math.min(drag.sx,drag.ex), x2=Math.max(drag.sx,drag.ex);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(pa.x, pa.y, x1-pa.x, pa.h);
+    ctx.fillRect(x2, pa.y, pa.x+pa.w-x2, pa.h);
+    ctx.fillStyle = 'rgba(186,117,23,0.15)';
+    ctx.fillRect(x1, pa.y, x2-x1, pa.h);
+    ctx.strokeStyle = '#BA7517'; ctx.lineWidth = 2; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(x1, pa.y); ctx.lineTo(x1, pa.y+pa.h); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2, pa.y); ctx.lineTo(x2, pa.y+pa.h); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  if (N.sel && !dragging) {
+    var sx1=N.sel.x1, sx2=N.sel.x2;
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(pa.x, pa.y, sx1-pa.x, pa.h);
+    ctx.fillRect(sx2, pa.y, pa.x+pa.w-sx2, pa.h);
+    ctx.fillStyle = 'rgba(186,117,23,0.12)';
+    ctx.fillRect(sx1, pa.y, sx2-sx1, pa.h);
+    var hw = 12;
+    ctx.fillStyle = '#BA7517';
+    ctx.fillRect(sx1-hw/2, pa.y, hw, pa.h);
+    ctx.fillRect(sx2-hw/2, pa.y, hw, pa.h);
+    if (N.ns) {
+      var ty = pa.y + (1-N.ns.max)*pa.h, by = pa.y + (1-N.ns.min)*pa.h;
+      ctx.strokeStyle = '#BA7517'; ctx.lineWidth = 1.5; ctx.setLineDash([5,3]);
+      ctx.beginPath(); ctx.moveTo(sx1, ty); ctx.lineTo(sx2, ty); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx1, by); ctx.lineTo(sx2, by); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#BA7517'; ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('h', (sx1+sx2)/2, (ty+by)/2+5);
+    }
+  }
+}
+
+function commitNoise() {
+  var x1=Math.min(drag.sx,drag.ex), x2=Math.max(drag.sx,drag.ex);
+  if (x2-x1 < 5) return;
+  var pa = N.pa, curve = N.curve;
+  var i1 = Math.max(0, Math.round(x1-pa.x));
+  var i2 = Math.min(curve.length-1, Math.round(x2-pa.x));
+  var vals = [];
+  for (var i=i1; i<=i2; i++) if (curve[i] !== null) vals.push(curve[i]);
+  if (vals.length < 3) return;
+  vals.sort(function(a,b){ return a-b; });
+  var lo=Math.floor(vals.length*.10), hi=Math.ceil(vals.length*.90);
+  var tr = vals.slice(lo, hi);
+  N.sel = { x1:x1, x2:x2 };
+  N.ns  = { max: tr[tr.length-1], min: tr[0] };
+  redrawNoise(false);
+  document.getElementById('btn-noise-ok').disabled = false;
+  document.getElementById('hint-noise').textContent = '✓ Región de ruido seleccionada. Redibujá si es necesario.';
+}
+
+// ── CONFIRM ────────────────────────────────────────────────────
+function confirmPeak() {
+  var ymax = parseFloat(document.getElementById('peak-ymax').value);
+  var ymin = parseFloat(document.getElementById('peak-ymin').value);
+  if (isNaN(ymax) || isNaN(ymin)) { alert('Ingresá los valores de escala Y.'); return; }
+  P.ymax = ymax; P.ymin = ymin;
+  document.getElementById('dot1').className = 'stepdot done';
+  document.getElementById('dot1').textContent = '✓';
+  document.getElementById('card2').classList.remove('hidden');
+  document.getElementById('dot2').classList.add('active');
+  document.getElementById('card2').scrollIntoView({ behavior:'smooth' });
+}
+
+function confirmNoise() {
+  var ymax = parseFloat(document.getElementById('noise-ymax').value);
+  var ymin = parseFloat(document.getElementById('noise-ymin').value);
+  if (isNaN(ymax) || isNaN(ymin)) { alert('Ingresá los valores de escala Y.'); return; }
+  N.ymax = ymax; N.ymin = ymin;
+  document.getElementById('dot2').className = 'stepdot done';
+  document.getElementById('dot2').textContent = '✓';
+  document.getElementById('card3').classList.remove('hidden');
+  document.getElementById('dot3').classList.add('active');
+  document.getElementById('card3').scrollIntoView({ behavior:'smooth' });
+}
+
+// ── CALCULATE ──────────────────────────────────────────────────
+function calculate() {
+  if (!P.pk || !N.ns) { alert('Completá los pasos anteriores.'); return; }
+  var pr = P.ymax - P.ymin, nr = N.ymax - N.ymin;
+  var H  = (P.pk.maxV - P.pk.baseNorm) * pr;
+  var h  = (N.ns.max  - N.ns.min)      * nr;
+  if (H <= 0) { alert('H es cero o negativo — redibujá la línea de base sobre la base del pico.'); return; }
+  if (h <= 0) { alert('h es cero — ajustá la región de ruido.'); return; }
+  var sn = method === 'pp' ? H / (h/2) : (2*H) / h;
+  var tf = calcTF();
+  showRes(sn, tf, H, h);
+}
+
+function calcTF() {
+  var pk = P.pk, curve = P.cropCurve;
+  if (!pk || !curve) return null;
+  var seg = [];
+  for (var i = pk.i1; i <= pk.i2; i++) seg.push(curve[i] !== null ? curve[i] : 0);
+  if (seg.length < 5) return null;
+  var mi = pk.maxI - pk.i1, base = pk.baseNorm, H = seg[mi] - base;
+  var lv5 = base + H*.05, le = 0, re = seg.length-1;
+  for (var i=0; i<=mi; i++) if (seg[i] >= lv5) { le=i; break; }
+  for (var i=seg.length-1; i>=mi; i--) if (seg[i] >= lv5) { re=i; break; }
+  var a = mi-le, b = re-mi;
+  if (a <= 0) return null;
+  return (a+b) / (2*a);
+}
+
+// ── RESULTS ────────────────────────────────────────────────────
+function showRes(sn, tf, H, h) {
+  var sc  = sn>=10?'ok':sn>=3?'warn':'bad';
+  var sl  = sn>=10?'Aceptable (≥10 USP)':sn>=3?'Límite (3–10)':'Insuficiente (<3)';
+  var tc  = tf===null?'warn':(tf>=0.8&&tf<=2.0)?'ok':tf<=2.5?'warn':'bad';
+  var tl  = tf===null?'No calculado':(tf>=0.8&&tf<=2.0)?'Aceptable (0.8–2.0)':tf<=2.5?'Límite (≤2.5)':'Fuera de rango (>2.5)';
+  var td  = tf!==null?tf.toFixed(2):'N/D';
+  var ml  = { usp:'USP <621>', ep:'EP 2.2.46', pp:'Peak-to-peak' };
+  var si  = sn>=10?'Pico cuantificable con buena exactitud.':sn>=3?'Detectable, cuantificación con mayor incertidumbre.':'En límite de detección. Considerar optimización del método.';
+  var ti  = tf===null?'':(tf<0.8?'Fronting pronunciado — posible efecto de solvente o sobrecarga.':tf<=1.3?'Pico simétrico — excelente eficiencia cromatográfica.':tf<=2.0?'Tailing leve — aceptable para la mayoría de los métodos.':tf<=2.5?'Tailing moderado — puede afectar la cuantificación.':'Tailing severo — revisar columna, temperatura o pH de fase móvil.');
+  var sec = document.getElementById('results');
+  sec.classList.remove('hidden');
+  sec.innerHTML =
+    '<div class="card">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">'+
+    '<div><div style="font-size:14px;font-weight:700;color:#1a1a2e">Resultado del análisis</div>'+
+    '<span style="font-size:10px;padding:2px 8px;border-radius:4px;background:#E6F1FB;color:#185FA5;font-weight:700">'+ml[method]+'</span></div>'+
+    '<div style="font-size:10px;color:#bbb;text-align:right">orientativo<br>no regulatorio</div></div>'+
+    '<div class="metrics">'+
+    '<div class="metric"><div class="mlabel">S / N</div><div class="mval '+sc+'">'+sn.toFixed(1)+'</div><div class="mdet">H='+Math.round(H)+' · h='+Math.round(h)+'</div></div>'+
+    '<div class="metric"><div class="mlabel">Tailing Factor</div><div class="mval '+tc+'">'+td+'</div><div class="mdet">USP &lt;621&gt; 5%</div></div>'+
+    '</div>'+
+    '<div class="status '+sc+'"><div class="sdot"></div>S/N: '+sl+'</div>'+
+    '<div class="status '+tc+'"><div class="sdot"></div>TF: '+tl+'</div>'+
+    '<div class="obs"><strong>S/N:</strong> '+si+(ti?'<br><strong>TF:</strong> '+ti:'')+'</div>'+
+    '<div class="disc">Resultado orientativo — verificar en software validado del equipo.<br>'+
+    '<a href="https://www.agsanalitica.com.ar" target="_blank">AGS Analítica S.A.</a> · Soporte técnico en cromatografía · Buenos Aires</div>'+
+    '</div>'+
+    '<button class="btn btn-ghost" onclick="location.reload()" style="border:1.5px solid #ddd;margin-top:6px">Nuevo análisis</button>';
+  sec.scrollIntoView({ behavior:'smooth' });
+  document.getElementById('dot3').className = 'stepdot done';
+  document.getElementById('dot3').textContent = '✓';
+}
+
+// ── IMAGE ALGORITHMS ───────────────────────────────────────────
+function detectPA(canvas) {
+  var w=canvas.width, h=canvas.height;
+  var ctx=canvas.getContext('2d',{willReadFrequently:true});
+  var data=ctx.getImageData(0,0,w,h).data;
+  function px(x,y){var i=(y*w+x)*4;return{r:data[i],g:data[i+1],b:data[i+2]};}
+  function df(a,b){return Math.abs(a.r-b.r)+Math.abs(a.g-b.g)+Math.abs(a.b-b.b);}
+  var bg=px(Math.floor(w*.7),Math.floor(h*.1));
+  var left=Math.floor(w*.04);
+  for(var x=Math.floor(w*.02);x<Math.floor(w*.3);x++){
+    var n=0;
+    for(var y=Math.floor(h*.1);y<Math.floor(h*.8);y++)if(df(px(x,y),bg)>35)n++;
+    if(n<4)left=x;else break;
+  }
+  var bottom=Math.floor(h*.88);
+  for(var y2=Math.floor(h*.95);y2>Math.floor(h*.6);y2--){
+    var n2=0;
+    for(var x2=Math.floor(w*.1);x2<Math.floor(w*.9);x2++)if(df(px(x2,y2),bg)>35)n2++;
+    if(n2<6)bottom=y2;else break;
+  }
+  return{x:left+2,y:Math.floor(h*.02),w:Math.floor(w*.97)-left-2,h:bottom-Math.floor(h*.02),bg:bg};
+}
+
+function extractCurve(canvas, pa) {
+  var ctx = canvas.getContext('2d',{willReadFrequently:true});
   var data = ctx.getImageData(pa.x, pa.y, pa.w, pa.h).data;
-  var bg = pa.bg;
-  var curve = new Array(pa.w).fill(null);
-  for (var col=0; col<pa.w; col++) {
-    var bestRow=null, bestDiff=0;
-    for (var row=0; row<pa.h; row++) {
+  var bg = pa.bg, curve = new Array(pa.w).fill(null);
+  for(var col=0;col<pa.w;col++){
+    var best=null,bd=0;
+    for(var row=0;row<pa.h;row++){
       var i=(row*pa.w+col)*4;
       var d=Math.abs(data[i]-bg.r)+Math.abs(data[i+1]-bg.g)+Math.abs(data[i+2]-bg.b);
-      if (d>bestDiff && d>20) { bestDiff=d; bestRow=row; }
+      if(d>bd&&d>20){bd=d;best=row;}
     }
-    if (bestRow!==null) curve[col]=1-bestRow/pa.h;
+    if(best!==null)curve[col]=1-best/pa.h;
   }
-  var out=curve.slice(), R=3;
-  for (var i=R; i<curve.length-R; i++) {
-    if (curve[i]===null) continue;
-    var sum=0,cnt=0;
-    for (var j=-R; j<=R; j++) { if(curve[i+j]!==null){sum+=curve[i+j];cnt++;} }
-    out[i]=sum/cnt;
+  var out=curve.slice(),R=3;
+  for(var i=R;i<curve.length-R;i++){
+    if(curve[i]===null)continue;
+    var s=0,c=0;
+    for(var j=-R;j<=R;j++)if(curve[i+j]!==null){s+=curve[i+j];c++;}
+    out[i]=s/c;
   }
   return out;
 }
 
-// ── VALIDATION ────────────────────────────────────────────────
-function validateImage(pa, curve, canvas, which) {
-  var checks=[], ok=true;
-  var ratio=(pa.w*pa.h)/(canvas.width*canvas.height);
-  if (ratio<0.2) { checks.push({cls:'bad',text:'El gráfico ocupa muy poco — acercate más'}); ok=false; }
-  else checks.push({cls:'ok',text:'Área del gráfico detectada'});
-  var valid=curve.filter(function(v){return v!==null;});
-  if (valid.length<pa.w*0.3) { checks.push({cls:'bad',text:'No se detecta trazo — verificá la foto'}); ok=false; }
-  else checks.push({cls:'ok',text:'Trazo del cromatograma detectado'});
-  return {checks:checks, ok:ok};
-}
-
-function renderChecks(div, result) {
-  div.innerHTML = result.checks.map(function(c){
-    var icon=c.cls==='ok'?'✓':c.cls==='warn'?'⚠':'✗';
-    return '<div class="guide-item '+c.cls+'"><span class="gi">'+icon+'</span>'+c.text+'</div>';
-  }).join('');
-}
-
-// ── CANVAS SETUP ──────────────────────────────────────────────
-function setupCanvas(which) {
-  var el  = document.getElementById(which+'-canvas');
-  var src = S[which].src;
-  // Canvas internal resolution = source image size
-  el.width  = src.width;
-  el.height = src.height;
-  var ctx = el.getContext('2d', { willReadFrequently:true });
-  ctx.drawImage(src, 0, 0);
-  S[which].ctx = ctx;
-  drawPlotBorder(which);
-  bindEvents(which);
-}
-
-function drawPlotBorder(which) {
-  var ctx=S[which].ctx, pa=S[which].plotArea;
-  ctx.strokeStyle='rgba(55,138,221,0.4)';
-  ctx.lineWidth=2;
+function drawBorderOn(ctx, pa) {
+  ctx.strokeStyle='rgba(55,138,221,0.4)';ctx.lineWidth=2;
   ctx.strokeRect(pa.x,pa.y,pa.w,pa.h);
-}
-
-// ── DRAW MODE ─────────────────────────────────────────────────
-function startDrawMode() {
-  S.drawMode = true;
-  var el = document.getElementById('peak-canvas');
-  el.classList.add('draw-mode');
-  var btn = document.getElementById('btn-draw-baseline');
-  btn.classList.add('active');
-  btn.textContent = '✏️ Dibujando... arrastrá sobre la baseline';
-  document.getElementById('peak-hint').innerHTML = 
-    '<strong>Modo dibujo activo</strong> — arrastrá con un dedo sobre la baseline del pico.';
-}
-
-function stopDrawMode() {
-  S.drawMode = false;
-  var el = document.getElementById('peak-canvas');
-  el.classList.remove('draw-mode');
-  var btn = document.getElementById('btn-draw-baseline');
-  btn.classList.remove('active');
-  btn.textContent = '✏️ Redibujar baseline';
-  document.getElementById('peak-hint').textContent = 
-    '✓ Baseline dibujada. Hacé zoom para verificar o redibujá si es necesario.';
-}
-
-// ── EVENT BINDING ─────────────────────────────────────────────
-function bindEvents(which) {
-  var el = document.getElementById(which+'-canvas');
-  // Don't clone - just attach listeners directly (cloning loses canvas content on iOS)
-  // Use a flag on the element to avoid duplicate listeners
-  if (el._listenersAttached) return;
-  el._listenersAttached = true;
-
-  (function(w) {
-    el.addEventListener('mousedown',  function(e){ onDown(e, w); }, false);
-    el.addEventListener('mousemove',  function(e){ onMove(e, w); }, false);
-    el.addEventListener('mouseup',    function(e){ onUp(e, w); },   false);
-    el.addEventListener('touchstart', function(e){
-      if (e.touches.length===1 && (w!=='peak' || S.drawMode)) {
-        e.preventDefault(); onDown(e.touches[0], w);
-      }
-    }, {passive:false});
-    el.addEventListener('touchmove',  function(e){
-      if (e.touches.length===1 && S.drag.active && S.drag.which===w) {
-        e.preventDefault(); onMove(e.touches[0], w);
-      }
-    }, {passive:false});
-    el.addEventListener('touchend', function(e){
-      if (S.drag.active && S.drag.which===w) {
-        e.preventDefault(); onUp(e.changedTouches[0], w);
-      }
-    }, {passive:false});
-  })(which);
-}
-
-function getPos(e, which) {
-  var el    = document.getElementById(which+'-canvas');
-  var rect  = el.getBoundingClientRect();
-  var zoom  = S[which].zoom || 1;
-  // rect.width = el.width * zoom (because of CSS transform scale)
-  // so scaleX = el.width / rect.width = 1/zoom
-  // but we want canvas coordinates, so divide by zoom
-  var scaleX = el.width  / rect.width;
-  var scaleY = el.height / rect.height;
-  return {
-    x: (e.clientX - rect.left) * scaleX,
-    y: (e.clientY - rect.top)  * scaleY
-  };
-}
-
-function onDown(e, which) {
-  var pos = getPos(e, which);
-  if (which === 'peak') {
-    if (!S.drawMode) return; // only draw when in draw mode
-    S.drag = { active:true, which:'peak', mode:'baseline', startX:pos.x, startY:pos.y, endX:pos.x, endY:pos.y };
-  } else {
-    // Noise selection mode - check if near existing handle
-    var sel = S.noise.sel;
-    var pa  = S.noise.plotArea;
-    var mode = 'new';
-    if (sel) {
-      if (Math.abs(pos.x - sel.x1) < 22) mode = 'left';
-      else if (Math.abs(pos.x - sel.x2) < 22) mode = 'right';
-    }
-    S.drag = { active:true, which:'noise', mode:mode, startX:pos.x, startY:pos.y };
-    if (mode==='new') S.noise.sel = { x1:pos.x, x2:pos.x };
-  }
-}
-
-function onMove(e, which) {
-  if (!S.drag.active || S.drag.which!==which) return;
-  var pos = getPos(e, which);
-  if (which==='peak') {
-    S.drag.endX = pos.x;
-    S.drag.endY = pos.y;
-    redrawPeak();
-    drawBaselineDrag();
-  } else {
-    var sel = S.noise.sel;
-    if (S.drag.mode==='left')       S.noise.sel = { x1:Math.min(pos.x, sel.x2-10), x2:sel.x2 };
-    else if (S.drag.mode==='right') S.noise.sel = { x1:sel.x1, x2:Math.max(pos.x, sel.x1+10) };
-    else                            S.noise.sel = { x1:Math.min(S.drag.startX,pos.x), x2:Math.max(S.drag.startX,pos.x) };
-    redrawNoise();
-  }
-}
-
-function onUp(e, which) {
-  if (!S.drag.active) return;
-  S.drag.active = false;
-  if (which==='peak') {
-    if (!S.drag.active) return;
-    var pos = getPos(e, which);
-    S.drag.endX = pos.x;
-    S.drag.endY = pos.y;
-    commitBaseline();
-    stopDrawMode();
-  } else {
-    var sel = S.noise.sel;
-    if (sel && sel.x2-sel.x1 > 5) analyzeNoise();
-  }
-}
-
-// ── PEAK: BASELINE DRAW ───────────────────────────────────────
-function redoBaseline() {
-  S.peak.baseline = null;
-  S.peak.peak     = null;
-  document.getElementById('btn-peak-ok').disabled = true;
-  redrawPeak();
-  startDrawMode();
-}
-
-function redrawPeak() {
-  var ctx = S.peak.ctx;
-  ctx.drawImage(S.peak.src, 0, 0);
-  drawPlotBorder('peak');
-  if (S.peak.baseline) drawBaselineCommitted();
-}
-
-function drawBaselineDrag() {
-  var ctx = S.peak.ctx;
-  var d   = S.drag;
-  ctx.strokeStyle = '#E24B4A';
-  ctx.lineWidth   = 2.5;
-  ctx.setLineDash([6,3]);
-  ctx.beginPath();
-  ctx.moveTo(d.startX, d.startY);
-  ctx.lineTo(d.endX,   d.endY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-}
-
-function commitBaseline() {
-  var d  = S.drag;
-  var pa = S.peak.plotArea;
-  // Normalize: left to right
-  var x1 = Math.min(d.startX, d.endX);
-  var y1 = d.startX < d.endX ? d.startY : d.endY;
-  var x2 = Math.max(d.startX, d.endX);
-  var y2 = d.startX < d.endX ? d.endY   : d.startY;
-
-  if (x2 - x1 < 10) return; // too short
-
-  // Find peak maximum between x1 and x2 in curve
-  var curve = S.peak.curve;
-  var i1 = Math.max(0, Math.round(x1 - pa.x));
-  var i2 = Math.min(curve.length-1, Math.round(x2 - pa.x));
-  var maxVal = -Infinity, maxIdx = i1;
-  for (var i=i1; i<=i2; i++) {
-    if (curve[i]!==null && curve[i]>maxVal) { maxVal=curve[i]; maxIdx=i; }
-  }
-
-  // Apex canvas Y: use curve value mapped to plot area
-  // curve value is normalized 0-1 (1=top of plot area)
-  var apexCanvasY = pa.y + (1 - maxVal) * pa.h;
-
-  // Baseline at apex: interpolate along the drawn line at the apex X position
-  var apexCanvasX = pa.x + maxIdx;
-  var frac = (x2-x1)>0 ? (apexCanvasX - x1)/(x2-x1) : 0.5;
-  frac = Math.max(0, Math.min(1, frac));
-  var baseCanvasY = y1 + frac*(y2-y1);
-  var baseNorm    = 1 - (baseCanvasY - pa.y) / pa.h;
-
-  // Safety: if baseline is above apex, something is wrong - warn user
-  if (baseCanvasY < apexCanvasY) {
-    baseCanvasY = apexCanvasY + 10; // prevent negative H
-    baseNorm = 1 - (baseCanvasY - pa.y) / pa.h;
-  }
-
-  S.peak.baseline = { x1:x1, y1:y1, x2:x2, y2:y2 };
-  S.peak.peak     = { maxVal:maxVal, maxIdx:maxIdx, baseAtApex:baseNorm, baseCanvasY:baseCanvasY, apexCanvasY:apexCanvasY, i1:i1, i2:i2 };
-
-  redrawPeak();
-  drawBaselineCommitted();
-  document.getElementById('btn-peak-ok').disabled = false;
-  document.getElementById('peak-hint').textContent = '✓ Baseline y pico detectados. Confirmá o redibujá la baseline si es necesario.';
-}
-
-function drawBaselineCommitted() {
-  var ctx = S.peak.ctx;
-  var pk  = S.peak.peak;
-  var bl  = S.peak.baseline;
-  var pa  = S.peak.plotArea;
-  if (!bl || !pk) return;
-
-  // Baseline line
-  ctx.strokeStyle = '#378ADD';
-  ctx.lineWidth   = 2.5;
-  ctx.beginPath();
-  ctx.moveTo(bl.x1, bl.y1);
-  ctx.lineTo(bl.x2, bl.y2);
-  ctx.stroke();
-
-  // Endpoint dots
-  ctx.fillStyle = '#378ADD';
-  ctx.beginPath(); ctx.arc(bl.x1, bl.y1, 5, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(bl.x2, bl.y2, 5, 0, Math.PI*2); ctx.fill();
-
-  // Apex dot - use stored apexCanvasY for accuracy
-  var apX = pa.x + pk.maxIdx;
-  var apY = pk.apexCanvasY !== undefined ? pk.apexCanvasY : pa.y + (1-pk.maxVal)*pa.h;
-  ctx.fillStyle = '#E24B4A';
-  ctx.beginPath(); ctx.arc(apX, apY, 6, 0, Math.PI*2); ctx.fill();
-
-  // H line from apex to baseline
-  ctx.strokeStyle = '#E24B4A';
-  ctx.lineWidth   = 3;
-  ctx.setLineDash([4,3]);
-  ctx.beginPath();
-  ctx.moveTo(apX, apY);
-  ctx.lineTo(apX, pk.baseCanvasY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // H label
-  ctx.fillStyle   = '#E24B4A';
-  ctx.font        = 'bold 16px sans-serif';
-  ctx.fillText('H', apX+8, (apY+pk.baseCanvasY)/2+6);
-}
-
-// ── NOISE ─────────────────────────────────────────────────────
-function redrawNoise() {
-  var ctx = S.noise.ctx;
-  var pa  = S.noise.plotArea;
-  var sel = S.noise.sel;
-  ctx.drawImage(S.noise.src, 0, 0);
-  drawPlotBorder('noise');
-  if (!sel) return;
-
-  var x1=sel.x1, x2=sel.x2;
-  ctx.fillStyle='rgba(0,0,0,0.3)';
-  ctx.fillRect(pa.x, pa.y, x1-pa.x, pa.h);
-  ctx.fillRect(x2, pa.y, pa.x+pa.w-x2, pa.h);
-  ctx.fillStyle='rgba(186,117,23,0.15)';
-  ctx.fillRect(x1, pa.y, x2-x1, pa.h);
-
-  // Handles
-  var hW=12;
-  ctx.fillStyle='#BA7517';
-  ctx.fillRect(x1-hW/2, pa.y, hW, pa.h);
-  ctx.fillRect(x2-hW/2, pa.y, hW, pa.h);
-  ctx.strokeStyle='#fff'; ctx.lineWidth=1.5;
-  [0.35,0.5,0.65].forEach(function(f){
-    var y=pa.y+pa.h*f;
-    ctx.beginPath(); ctx.moveTo(x1-4,y); ctx.lineTo(x1+4,y); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x2-4,y); ctx.lineTo(x2+4,y); ctx.stroke();
-  });
-
-  if (S.noise.noise) drawNoiseBands();
-}
-
-function analyzeNoise() {
-  var pa    = S.noise.plotArea;
-  var curve = S.noise.curve;
-  var sel   = S.noise.sel;
-  var i1 = Math.max(0, Math.round(sel.x1-pa.x));
-  var i2 = Math.min(curve.length-1, Math.round(sel.x2-pa.x));
-
-  // Use percentile 10-90 to exclude stray peaks
-  var vals = [];
-  for (var i=i1; i<=i2; i++) { if(curve[i]!==null) vals.push(curve[i]); }
-  if (vals.length<3) return;
-  vals.sort(function(a,b){return a-b;});
-  var lo = Math.floor(vals.length*0.10);
-  var hi = Math.ceil(vals.length*0.90);
-  var trimmed = vals.slice(lo, hi);
-  var noiseMin = trimmed[0];
-  var noiseMax = trimmed[trimmed.length-1];
-
-  S.noise.noise = { max:noiseMax, min:noiseMin, i1:i1, i2:i2 };
-  redrawNoise();
-  document.getElementById('btn-noise-ok').disabled = false;
-  document.getElementById('noise-hint').textContent = '✓ Región de ruido seleccionada. Ajustá los handles si es necesario.';
-}
-
-function drawNoiseBands() {
-  var ctx = S.noise.ctx;
-  var pa  = S.noise.plotArea;
-  var n   = S.noise.noise;
-  var sel = S.noise.sel;
-  if (!n||!sel) return;
-  var topY = pa.y+(1-n.max)*pa.h;
-  var botY = pa.y+(1-n.min)*pa.h;
-  ctx.strokeStyle='#BA7517'; ctx.lineWidth=1.5; ctx.setLineDash([6,3]);
-  ctx.beginPath(); ctx.moveTo(sel.x1,topY); ctx.lineTo(sel.x2,topY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(sel.x1,botY); ctx.lineTo(sel.x2,botY); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle='#BA7517'; ctx.font='bold 13px sans-serif';
-  ctx.fillText('h', (sel.x1+sel.x2)/2, (topY+botY)/2+5);
-}
-
-// ── CONFIRM STEPS ─────────────────────────────────────────────
-function confirmPeak() {
-  var ymax=parseFloat(document.getElementById('peak-ymax').value);
-  var ymin=parseFloat(document.getElementById('peak-ymin').value);
-  if (isNaN(ymax)||isNaN(ymin)) { alert('Ingresá los valores de escala Y.'); return; }
-  S.peak.ymax=ymax; S.peak.ymin=ymin;
-  document.getElementById('dot1').className='stepdot done';
-  document.getElementById('dot1').textContent='✓';
-  document.getElementById('card-noise').classList.remove('hidden');
-  document.getElementById('dot2').classList.add('active');
-  document.getElementById('card-noise').scrollIntoView({behavior:'smooth'});
-}
-
-function confirmNoise() {
-  var ymax=parseFloat(document.getElementById('noise-ymax').value);
-  var ymin=parseFloat(document.getElementById('noise-ymin').value);
-  if (isNaN(ymax)||isNaN(ymin)) { alert('Ingresá los valores de escala Y.'); return; }
-  S.noise.ymax=ymax; S.noise.ymin=ymin;
-  document.getElementById('dot2').className='stepdot done';
-  document.getElementById('dot2').textContent='✓';
-  document.getElementById('card-method').classList.remove('hidden');
-  document.getElementById('dot3').classList.add('active');
-  document.getElementById('card-method').scrollIntoView({behavior:'smooth'});
-}
-
-// ── METHOD ────────────────────────────────────────────────────
-function selMethod(m) {
-  S.method=m;
-  ['usp','ep','pp'].forEach(function(x){ document.getElementById('m-'+x).classList.toggle('sel',x===m); });
-  document.getElementById('mdesc').innerHTML=MDESC[m];
-}
-
-// ── CALCULATE ────────────────────────────────────────────────
-function calculate() {
-  var pk=S.peak.peak, ns=S.noise.noise;
-  if (!pk||!ns) { alert('Completá los pasos anteriores.'); return; }
-
-  var peakRange  = S.peak.ymax  - S.peak.ymin;
-  var noiseRange = S.noise.ymax - S.noise.ymin;
-
-  // H: from maxVal to baseAtApex, in normalized units → convert to real
-  var H = (pk.maxVal - pk.baseAtApex) * peakRange;
-  var h = (ns.max    - ns.min)        * noiseRange;
-
-  if (H<=0) { alert('La altura del pico es cero o negativa. Redibujá la baseline sobre la base del pico.'); return; }
-  if (h<=0) { alert('El ruido calculado es cero. Ajustá la región de ruido.'); return; }
-
-  var sn;
-  if (S.method==='pp') sn = H/(h/2);
-  else sn = (2*H)/h;
-
-  var tf = estimateTF();
-  renderResults(sn, tf, H, h);
-}
-
-// ── TAILING FACTOR ────────────────────────────────────────────
-function estimateTF() {
-  var pk    = S.peak.peak;
-  var curve = S.peak.curve;
-  var pa    = S.peak.plotArea;
-  if (!pk||!curve) return null;
-
-  var i1=pk.i1, i2=pk.i2, maxIdx=pk.maxIdx;
-  var seg=[];
-  for (var i=i1; i<=i2; i++) seg.push(curve[i]!==null?curve[i]:0);
-  if (seg.length<5) return null;
-
-  var base    = pk.baseAtApex;
-  var maxV    = seg[maxIdx-i1];
-  var H       = maxV-base;
-  var level5  = base+H*0.05;
-
-  var leftEdge=0;
-  for (var i=0; i<=maxIdx-i1; i++) { if(seg[i]>=level5){leftEdge=i;break;} }
-  var rightEdge=seg.length-1;
-  for (var i=seg.length-1; i>=maxIdx-i1; i--) { if(seg[i]>=level5){rightEdge=i;break;} }
-
-  var a=(maxIdx-i1)-leftEdge;
-  var b=rightEdge-(maxIdx-i1);
-  if (a<=0) return null;
-  return (a+b)/(2*a);
-}
-
-// ── RENDER RESULTS ────────────────────────────────────────────
-function renderResults(sn, tf, H, h) {
-  var ml={usp:'USP <621>',ep:'EP 2.2.46',pp:'Peak-to-peak'};
-  var snC=sn>=10?'ok':sn>=3?'warn':'bad';
-  var snL=sn>=10?'Aceptable (≥10 USP)':sn>=3?'Límite (3–10)':'Insuficiente (<3)';
-  var tfC=tf===null?'warn':(tf>=0.8&&tf<=2.0)?'ok':tf<=2.5?'warn':'bad';
-  var tfL=tf===null?'No calculado':(tf>=0.8&&tf<=2.0)?'Aceptable (0.8–2.0 USP)':tf<=2.5?'Límite (hasta 2.5)':'Fuera de rango (>2.5)';
-  var tfD=tf!==null?tf.toFixed(2):'N/D';
-  var snI=sn>=10?'Pico cuantificable con buena exactitud.':sn>=3?'Pico detectable, cuantificación con mayor incertidumbre.':'En el límite de detección. Considerar optimización del método.';
-  var tfI=tf===null?'':('<br><br><strong>TF:</strong> '+(tf<0.8?'Fronting pronunciado — posible efecto de solvente o sobrecarga.':tf<=1.3?'Pico simétrico — excelente eficiencia.':tf<=2.0?'Tailing leve — aceptable para la mayoría de los métodos.':tf<=2.5?'Tailing moderado — puede afectar la cuantificación.':'Tailing severo — revisar columna, temperatura o pH.'));
-
-  var sec=document.getElementById('results');
-  sec.classList.remove('hidden');
-  sec.innerHTML=
-    '<div class="result-card">'+
-      '<div class="result-header">'+
-        '<div><div class="result-title">Resultado del análisis</div>'+
-        '<span class="result-tag">'+ml[S.method]+'</span></div>'+
-        '<div style="font-size:11px;color:#bbb;text-align:right">orientativo<br>no regulatorio</div>'+
-      '</div>'+
-      '<div class="metrics">'+
-        '<div class="metric"><div class="metric-label">S / N</div>'+
-          '<div class="metric-val '+snC+'">'+sn.toFixed(1)+'</div>'+
-          '<div class="metric-detail">H='+Math.round(H)+' · h='+Math.round(h)+'</div></div>'+
-        '<div class="metric"><div class="metric-label">Tailing Factor</div>'+
-          '<div class="metric-val '+tfC+'">'+tfD+'</div>'+
-          '<div class="metric-detail">USP &lt;621&gt; al 5%</div></div>'+
-      '</div>'+
-      '<div class="status '+snC+'"><div class="sdot"></div>S/N: '+snL+'</div>'+
-      '<div class="status '+tfC+'"><div class="sdot"></div>TF: '+tfL+'</div>'+
-      '<div class="obs"><strong>S/N:</strong> '+snI+tfI+'</div>'+
-      '<div class="divider"></div>'+
-      '<div class="disclaimer">Resultado orientativo — no válido para documentación regulatoria.<br>'+
-        'Verificar siempre en el software validado del equipo.<br><br>'+
-        '<a href="https://www.agsanalitica.com.ar" target="_blank">AGS Analítica S.A.</a> · Soporte técnico en cromatografía · Buenos Aires'+
-      '</div>'+
-    '</div>'+
-    '<button class="btn btn-ghost" onclick="location.reload()" style="border:1.5px solid #ddd;margin-top:6px">Nuevo análisis</button>';
-  sec.scrollIntoView({behavior:'smooth'});
-  document.getElementById('dot3').className='stepdot done';
-  document.getElementById('dot3').textContent='✓';
 }
 </script>
 </body>
