@@ -444,7 +444,9 @@ function mv(e,id){
   else rdNoise(true);
 }
 function up(e,id){
-  if(!drag.on)return;
+  if(!drag.on||drag.which!==id)return;
+  // Update final position from event if available
+  try{var p=gp(e,id);drag.ex=p.x;drag.ey=p.y;}catch(err){}
   drag.on=false;
   if(id==='full')commitSel();
   else if(id==='crop')commitBL();
@@ -482,13 +484,14 @@ function drawSelX(ctx,selX){
 
 function commitSel(){
   var x1=Math.min(drag.sx,drag.ex),x2=Math.max(drag.sx,drag.ex);
-  if(x2-x1<8)return;
-  // Clamp to plot area X
+  if(x2-x1<8){return;}
   var pa=P.pa;
   x1=Math.max(pa.x,x1); x2=Math.min(pa.x+pa.w,x2);
   P.selX={x1:x1,x2:x2};
   rdFull(false);
-  document.getElementById('btn-ampliar').disabled=false;
+  var btn=document.getElementById('btn-ampliar');
+  btn.disabled=false;
+  btn.style.background='#0B2545';
   document.getElementById('hint-B').textContent='✓ Pico seleccionado. Tocá "Ampliar" o redibujá la ventana.';
 }
 
