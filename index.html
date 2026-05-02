@@ -310,18 +310,20 @@ function doCrop(){
   var cx2=Math.min(pa.x+pa.w, P.selX.x2+pad);
   var cy1=pa.y;
   var cy2=pa.y+pa.h;
-  var cw=cx2-cx1, ch=cy2-cy1;
+  var cw=Math.round(cx2-cx1), ch=Math.round(cy2-cy1);
+  if(cw<4||ch<4)return;
 
   var oc=document.createElement('canvas');
   oc.width=cw; oc.height=ch;
   var octx=oc.getContext('2d',{willReadFrequently:true});
   octx.drawImage(P.src, cx1, cy1, cw, ch, 0, 0, cw, ch);
   P.cropSrc=oc;
+  P.bl=null; P.pk=null;
 
-  // Extract curve from crop (full crop area)
   var cropPA={x:0,y:0,w:cw,h:ch,bg:P.pa.bg};
   P.cropCurve=extractCurve(oc,cropPA);
 
+  delete _bound['crop']; // reset so new canvas gets listeners
   hide('ph-B'); show('ph-C');
   setupCropCanvas();
 }
@@ -425,6 +427,11 @@ function intercept(id){
   return false;
 }
 
+function getEventId(e,id){
+  // for touch events on full canvas, check if near a handle
+  return id;
+}
+
 function gp(e,id){
   var elId=id==='full'?'cv-full':id==='crop'?'cv-crop':'cv-noise';
   var el=document.getElementById(elId);
@@ -435,10 +442,36 @@ function gp(e,id){
   };
 }
 
-function dn(e,id){var p=gp(e,id);drag={on:true,which:id,sx:p.x,sy:p.y,ex:p.x,ey:p.y};}
+function dn(e,id){
+  var p=gp(e,id);
+  if(id==='full'&&P.selX){
+    var hw=20; // handle hit zone
+    if(Math.abs(p.x-P.selX.x1)<hw){
+      drag={on:true,which:'full-left',sx:p.x,sy:p.y,ex:p.x,ey:p.y};
+      return;
+    }
+    if(Math.abs(p.x-P.selX.x2)<hw){
+      drag={on:true,which:'full-right',sx:p.x,sy:p.y,ex:p.x,ey:p.y};
+      return;
+    }
+  }
+  drag={on:true,which:id,sx:p.x,sy:p.y,ex:p.x,ey:p.y};
+}
 function mv(e,id){
-  if(!drag.on||drag.which!==id)return;
-  var p=gp(e,id);drag.ex=p.x;drag.ey=p.y;
+  if(!drag.on)return;
+  var p=gp(e,id);
+  if(drag.which==='full-left'&&P.selX){
+    P.selX.x1=Math.min(p.x, P.selX.x2-10);
+    rdFull(false);
+    return;
+  }
+  if(drag.which==='full-right'&&P.selX){
+    P.selX.x2=Math.max(p.x, P.selX.x1+10);
+    rdFull(false);
+    return;
+  }
+  if(drag.which!==id)return;
+  drag.ex=p.x;drag.ey=p.y;
   if(id==='full')rdFull(true);
   else if(id==='crop')rdCrop(true);
   else rdNoise(true);
@@ -475,11 +508,21 @@ function rdFull(dragging){
 
 function drawSelX(ctx,selX){
   var pa=P.pa;
-  ctx.fillStyle='rgba(29,158,117,0.18)';
+  // Tint selection
+  ctx.fillStyle='rgba(29,158,117,0.15)';
   ctx.fillRect(selX.x1,pa.y,selX.x2-selX.x1,pa.h);
-  ctx.strokeStyle='#1D9E75';ctx.lineWidth=2.5;
-  ctx.beginPath();ctx.moveTo(selX.x1,pa.y);ctx.lineTo(selX.x1,pa.y+pa.h);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(selX.x2,pa.y);ctx.lineTo(selX.x2,pa.y+pa.h);ctx.stroke();
+  // Handles
+  var hw=10;
+  ctx.fillStyle='#1D9E75';
+  ctx.fillRect(selX.x1-hw/2,pa.y,hw,pa.h);
+  ctx.fillRect(selX.x2-hw/2,pa.y,hw,pa.h);
+  // Grip lines on handles
+  ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+  [0.35,0.5,0.65].forEach(function(f){
+    var y=pa.y+pa.h*f;
+    ctx.beginPath();ctx.moveTo(selX.x1-3,y);ctx.lineTo(selX.x1+3,y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(selX.x2-3,y);ctx.lineTo(selX.x2+3,y);ctx.stroke();
+  });
 }
 
 function commitSel(){
